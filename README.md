@@ -1,0 +1,2 @@
+# AnimeRepo
+This is an anime website that has every detail about every anime you can possible think of , it run's on github and you can use advanced filters to do search and it has options to check dubbed anime's in any langaues and som many filter optiona dn where is the anime avaibal enow and much more and we user pure HTML 5 apps , so its usper fast does not need servers just plan browsers and the ftp does the job for us
