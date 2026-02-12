@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced anime database with real-time filtering, search, and language options">
+    <title>Anime Database - Search & Filter</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🎬 Anime Database</h1>
+                <p class="subtitle">39,000+ Anime • Advanced Filters • Lightning Fast</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Filters Section -->
+            <aside class="filters-panel">
+                <div class="filters-header">
+                    <h2>Filters</h2>
+                    <button id="clearFilters" class="btn-clear">Clear All</button>
+                </div>
+
+                <!-- Search -->
+                <div class="filter-group">
+                    <label for="searchInput">Search Title</label>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search anime..." 
+                        autocomplete="off"
+                    >
+                    <small id="searchResults" class="search-results">0 results</small>
+                </div>
+
+                <!-- Genre Filter -->
+                <div class="filter-group">
+                    <label>Genre</label>
+                    <div class="filter-checkbox-group" id="genreFilters">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Year Filter -->
+                <div class="filter-group">
+                    <label for="yearRange">Year Range</label>
+                    <input type="range" id="yearRange" min="1970" max="2026" value="2026" class="slider">
+                    <div class="year-display">
+                        <span id="yearMin">1970</span> - <span id="yearMax">2026</span>
+                    </div>
+                </div>
+
+                <!-- Type Filter -->
+                <div class="filter-group">
+                    <label>Type</label>
+                    <div class="filter-checkbox-group" id="typeFilters">
+                        <label class="checkbox">
+                            <input type="checkbox" value="TV" class="filter-checkbox" data-filter="type">
+                            <span>TV Series</span>
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" value="Movie" class="filter-checkbox" data-filter="type">
+                            <span>Movie</span>
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" value="OVA" class="filter-checkbox" data-filter="type">
+                            <span>OVA</span>
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" value="Special" class="filter-checkbox" data-filter="type">
+                            <span>Special</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Rating Filter -->
+                <div class="filter-group">
+                    <label for="ratingFilter">Minimum Rating</label>
+                    <select id="ratingFilter" class="filter-select">
+                        <option value="0">All Ratings</option>
+                        <option value="5">5.0+</option>
+                        <option value="6">6.0+</option>
+                        <option value="7">7.0+</option>
+                        <option value="7.5">7.5+</option>
+                        <option value="8">8.0+</option>
+                        <option value="8.5">8.5+</option>
+                        <option value="9">9.0+</option>
+                    </select>
+                </div>
+
+                <!-- Language Filter -->
+                <div class="filter-group">
+                    <label>Dubbed Languages</label>
+                    <div class="filter-checkbox-group" id="languageFilters">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                <!-- Results Header -->
+                <div class="results-header">
+                    <div class="results-info">
+                        <span id="resultCount" class="result-count">Loading...</span>
+                        <div class="sort-controls">
+                            <label for="sortBy">Sort by:</label>
+                            <select id="sortBy" class="sort-select">
+                                <option value="title">Title (A-Z)</option>
+                                <option value="year-desc">Year (Newest)</option>
+                                <option value="year-asc">Year (Oldest)</option>
+                                <option value="rating-desc">Rating (Highest)</option>
+                                <option value="rating-asc">Rating (Lowest)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-wrapper">
+                    <table class="anime-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Languages</th>
+                                <th>Genre</th>
+                                <th>Year</th>
+                                <th>Type</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="animeTableBody">
+                            <!-- Will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="loading-indicator">
+                    <div class="spinner"></div>
+                    <p>Loading anime database...</p>
+                </div>
+
+                <!-- No Results -->
+                <div id="noResults" class="no-results" style="display: none;">
+                    <p>No anime found matching your filters.</p>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination">
+                    <!-- Will be populated by JS -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2026 Anime Database | Pure HTML5 • No Server Required | <a href="https://github.com" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
