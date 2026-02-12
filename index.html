@@ -3,186 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Advanced anime database with 40,000+ titles, real-time filtering, and detailed anime information">
-    <title>Anime Database - Search & Filter 40K+ Titles</title>
-    <link rel="stylesheet" href="assets/css/styles-v2.css">
+    <meta name="description" content="Anime Database - 40,000+ anime titles with advanced filtering, search, and detailed information">
+    <title>Anime Database - 40K+ Titles • Search & Filter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #11998e;
+            --danger: #ff6b6b;
+            --light: #f8f9fa;
+            --dark: #2d3436;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f6fa;
+            color: var(--dark);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .filters-bar {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 8px 14px;
+            border: 2px solid var(--light);
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .chip:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .view-btn {
+            padding: 10px 15px;
+            border: 2px solid var(--light);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .view-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 8px;
+        }
+
+        .results-count {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .anime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .anime-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .anime-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .anime-poster {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, var(--light) 0%, #e0e0e0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            overflow: hidden;
+        }
+
+        .anime-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .anime-body {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .anime-title {
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.3;
+            margin-bottom: 10px;
+            color: var(--dark);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .anime-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .anime-year {
+            background: var(--light);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .anime-rating {
+            background: #ffc107;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .anime-type {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .anime-view-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+            margin-top: auto;
+        }
+
+        .anime-view-btn:hover {
+            background: var(--secondary);
+        }
+
+        .anime-list-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 20px;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .anime-list-item:hover {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+            transform: translateX(4px);
+        }
+
+        .anime-list-poster {
+            width: 100px;
+            height: 140px;
+            background: var(--light);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            overflow: hidden;
+        }
+
+        .anime-list-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .anime-list-info h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .anime-list-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #666;
+            flex-wrap: wrap;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 30px;
+        }
+
+        .pagination button {
+            padding: 10px 15px;
+            border: 2px solid var(--light);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .pagination button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            color: #666;
+        }
+
+        .footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .anime-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .anime-list-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .filters-bar {
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-top">
-                <h1>🎬 Anime Database</h1>
-                <p class="subtitle">40,000+ Anime • Advanced Filters • Real-time Search</p>
-            </div>
-
-            <!-- Top Filters -->
-            <div class="filters-top">
-                <div class="search-bar">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        placeholder="🔍 Search anime title..." 
-                        autocomplete="off"
-                    >
-                    <span id="searchCount" class="search-count"></span>
-                </div>
-
-                <div class="filter-buttons">
-                    <div class="view-toggle">
-                        <button id="viewList" class="view-btn active" title="List View">
-                            <span>≡ List</span>
-                        </button>
-                        <button id="viewCard" class="view-btn" title="Card View">
-                            <span>⊞ Cards</span>
-                        </button>
-                    </div>
-
-                    <button id="clearFilters" class="btn-clear">✕ Clear Filters</button>
-                    <button id="toggleFilters" class="btn-toggle-filters">⚙️ More Filters</button>
-                </div>
-            </div>
-
-            <!-- Expandable Filters Panel -->
-            <div class="filters-expandable" id="filtersExpandable">
-                <div class="filter-row">
-                    <!-- Genre Filter -->
-                    <div class="filter-group">
-                        <label>Genre</label>
-                        <div class="filter-chips" id="genreFilters"></div>
-                    </div>
-
-                    <!-- Year Filter -->
-                    <div class="filter-group">
-                        <label>Year</label>
-                        <input type="range" id="yearRange" min="1970" max="2026" value="2026" class="slider">
-                        <div class="year-display">
-                            <span id="yearMin">1970</span> - <span id="yearMax">2026</span>
-                        </div>
-                    </div>
-
-                    <!-- Type Filter -->
-                    <div class="filter-group">
-                        <label>Type</label>
-                        <div class="filter-chips" id="typeFilters"></div>
-                    </div>
-
-                    <!-- Rating Filter -->
-                    <div class="filter-group">
-                        <label>Rating</label>
-                        <select id="ratingFilter" class="filter-select">
-                            <option value="0">All Ratings</option>
-                            <option value="5">5.0+</option>
-                            <option value="6">6.0+</option>
-                            <option value="7">7.0+</option>
-                            <option value="7.5">7.5+</option>
-                            <option value="8">8.0+</option>
-                            <option value="8.5">8.5+</option>
-                            <option value="9">9.0+</option>
-                        </select>
-                    </div>
-
-                    <!-- Language Filter -->
-                    <div class="filter-group">
-                        <label>Languages</label>
-                        <div class="filter-chips" id="languageFilters"></div>
-                    </div>
-
-                    <!-- Sort -->
-                    <div class="filter-group">
-                        <label>Sort By</label>
-                        <select id="sortBy" class="filter-select">
-                            <option value="title">Title (A-Z)</option>
-                            <option value="year-desc">Year (Newest)</option>
-                            <option value="rating-desc">Rating (Highest)</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Result Info -->
-            <div class="result-info">
-                <div class="result-count">
-                    <span id="resultCount">Loading...</span>
-                    <span id="resultTime" class="result-time"></span>
-                </div>
-
-                <!-- Items Per Page -->
-                <div class="items-per-page">
-                    <label>Items per page:</label>
-                    <select id="itemsPerPageSelect" class="select-sm">
-                        <option value="20">20</option>
-                        <option value="50" selected>50</option>
-                        <option value="100">100</option>
-                        <option value="200">200</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Loading Indicator -->
-            <div id="loadingIndicator" class="loading-indicator">
-                <div class="spinner"></div>
-                <p>🔄 Loading anime database...</p>
-            </div>
-
-            <!-- List View -->
-            <div id="listView" class="list-view active">
-                <table class="anime-table">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Genres</th>
-                            <th>Languages</th>
-                            <th>Year</th>
-                            <th>Type</th>
-                            <th>Rating</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="animeTableBody">
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Card View -->
-            <div id="cardView" class="card-view">
-                <div class="cards-container" id="cardsContainer"></div>
-            </div>
-
-            <!-- No Results -->
-            <div id="noResults" class="no-results" style="display: none;">
-                <p>😢 No anime found matching your filters.</p>
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination-controls">
-                <div id="pagination" class="pagination"></div>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>© 2026 Anime Database | 40,000+ Anime • Pure HTML5 • No Tracking</p>
-            <p id="footerAds" class="footer-ads">
-                <!-- Ad spaces for Google AdSense, etc -->
-                <span class="ad-placeholder">[Ad Space 1]</span>
-                <span class="ad-placeholder">[Ad Space 2]</span>
-            </p>
-        </footer>
+    <!-- Header -->
+    <div class="header">
+        <h1>🎬 Anime Database</h1>
+        <p>40,000+ anime titles • Advanced filters • Detailed information</p>
     </div>
 
-    <!-- Detail Modal -->
-    <div id="detailModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <button class="modal-close">&times;</button>
-            <div id="detailContent"></div>
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Filters -->
+        <div class="filters-bar">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="🔍 Search anime title..."
+                    autocomplete="off"
+                >
+                <button class="btn btn-primary" onclick="applyFilters()">Search</button>
+                <button class="btn btn-secondary" onclick="clearAllFilters()">Clear</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                <div class="filter-group">
+                    <label>Genre</label>
+                    <div class="filter-chips" id="genreFilters"></div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Anime Type</label>
+                    <div class="filter-chips" id="typeFilters"></div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Year</label>
+                    <input type="range" id="yearRange" min="1970" max="2026" value="2026" style="width: 100%;">
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                        <span id="yearMin">1970</span> - <span id="yearMax">2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view-controls">
+                <button class="view-btn active" onclick="switchView('grid')">⊞ Grid</button>
+                <button class="view-btn" onclick="switchView('list')">≡ List</button>
+                <select id="itemsPerPage" onchange="applyFilters()" style="padding: 10px; border: 2px solid #f0f0f0; border-radius: 8px;">
+                    <option value="20">20/page</option>
+                    <option value="50" selected>50/page</option>
+                    <option value="100">100/page</option>
+                    <option value="200">200/page</option>
+                </select>
+            </div>
         </div>
+
+        <!-- Results Info -->
+        <div class="results-info">
+            <div class="results-count">
+                <span id="resultCount">0</span> results
+            </div>
+        </div>
+
+        <!-- Grid View -->
+        <div id="gridView" class="anime-grid"></div>
+
+        <!-- List View -->
+        <div id="listView" style="display: none;"></div>
+
+        <!-- No Results -->
+        <div id="noResults" class="no-results" style="display: none;">
+            <p>❌ No anime found matching your criteria</p>
+            <p style="font-size: 14px;">Try adjusting your filters or search terms</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
     </div>
 
-    <!-- Scripts -->
-    <script src="assets/js/app-v2.js"></script>
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2026 Anime Database | 40,000+ Titles | Open Source | <a href="https://github.com/mTulsiram/AnimeRepo" target="_blank">GitHub Repository</a></p>
+    </div>
+
+    <script src="assets/js/app-v3.js"></script>
 </body>
 </html>
