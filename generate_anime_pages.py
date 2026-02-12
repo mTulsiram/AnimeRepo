@@ -16,7 +16,27 @@ class AnimePageGenerator:
         self.output_dir.mkdir(exist_ok=True)
         self.generated_pages = 0
         self.failed_pages = 0
-        
+        self.language_dubs = self.load_language_dubs()
+    
+    def load_language_dubs(self):
+        """Load language dubs mapping"""
+        try:
+            with open('language_dubs.json', 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return {'english_dubbed': [], 'hindi_dubbed': []}
+    
+    def get_anime_languages(self, title):
+        """Determine which languages the anime is dubbed in"""
+        languages = []
+        if title in self.language_dubs.get('english_dubbed', []):
+            languages.append('English Dubbed')
+        if title in self.language_dubs.get('hindi_dubbed', []):
+            languages.append('Hindi Dubbed')
+        if not languages:
+            languages.append('Subtitled')
+        return languages
+    
     def load_anime_data(self, jsonl_file):
         """Load anime data from JSONL file (one JSON object per line)"""
         try:
@@ -77,6 +97,7 @@ class AnimePageGenerator:
             producers = anime.get('producers', [])
             tags = anime.get('tags', [])
             season = anime.get('animeSeason', {})
+            languages = self.get_anime_languages(title)
             
             # Calculate duration in minutes
             duration_secs = duration.get('value', 0) if isinstance(duration, dict) else 0
@@ -536,6 +557,11 @@ class AnimePageGenerator:
                 </div>''' if season.get('season') else ''}
                 
                 {f'<div class="info-card"><div class="info-card-title">Duration</div><div class="info-card-value">{duration_mins} min/ep</div></div>' if duration_mins else ''}
+                
+                {f'''<div class="info-card">
+                    <div class="info-card-title">Language</div>
+                    <div class="info-card-value">{', '.join(languages)}</div>
+                </div>'''}
                 
                 <div class="action-buttons">
                     <button class="btn btn-primary" onclick="alert('Share this anime!')"><i class="fas fa-share-alt"></i> Share</button>

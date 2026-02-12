@@ -602,6 +602,16 @@
 
             <div class="filter-grid">
                 <div class="filter-group">
+                    <label class="filter-label">Language</label>
+                    <select class="filter-select" id="languageFilter" onchange="applyFilters()">
+                        <option value="">All Languages</option>
+                        <option value="English">English Dubbed</option>
+                        <option value="Hindi">Hindi Dubbed</option>
+                        <option value="Subtitled">Subtitled</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
                     <label class="filter-label">Type</label>
                     <select class="filter-select" id="typeFilter" onchange="applyFilters()">
                         <option value="">All Types</option>
@@ -828,12 +838,14 @@
             const genre = document.getElementById('genreFilter').value;
             const year = document.getElementById('yearFilter').value;
             const status = document.getElementById('statusFilter').value;
+            const language = document.getElementById('languageFilter').value;
 
             filteredAnime = allAnime.filter(anime => {
                 if (type && anime.type !== type) return false;
                 if (genre && !anime.tags?.some(t => t.toLowerCase().includes(genre.toLowerCase()))) return false;
                 if (year && anime.animeSeason?.year != year) return false;
                 if (status && anime.status !== status) return false;
+                if (language && !anime.languages?.some(l => l.toLowerCase().includes(language.toLowerCase()))) return false;
                 return true;
             });
 
