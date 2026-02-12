@@ -17,23 +17,27 @@ class AnimePageGenerator:
         self.generated_pages = 0
         self.failed_pages = 0
         
-    def load_anime_data(self, json_file):
-        """Load anime data from JSON file"""
+    def load_anime_data(self, jsonl_file):
+        """Load anime data from JSONL file (one JSON object per line)"""
         try:
-            print(f"📥 Loading {json_file}...")
-            with open(json_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            # Extract anime list based on structure
-            if isinstance(data, dict):
-                anime_list = data.get('data', [])
-            else:
-                anime_list = data
+            print(f"📥 Loading {jsonl_file}...")
+            anime_list = []
+            with open(jsonl_file, 'r', encoding='utf-8') as f:
+                # Skip metadata line
+                f.readline()
+                
+                # Load each anime entry
+                for line in f:
+                    try:
+                        anime = json.loads(line.strip())
+                        anime_list.append(anime)
+                    except json.JSONDecodeError:
+                        continue
             
             print(f"✅ Loaded {len(anime_list)} anime")
             return anime_list
         except Exception as e:
-            print(f"❌ Error loading {json_file}: {e}")
+            print(f"❌ Error loading {jsonl_file}: {e}")
             return []
     
     def generate_anime_page(self, anime):
@@ -41,8 +45,22 @@ class AnimePageGenerator:
         try:
             title = anime.get('title', 'Unknown')
             
-            # Create safe filename
-            safe_filename = quote(title, safe='')[:100] + '.html'
+            # Create safe filename - handle all special characters
+            # Windows forbidden: < > : " / \ | ? *
+            # Also handle smart quotes and other Unicode variants
+            safe_title = title
+            # Replace forward/backward slashes
+            safe_title = safe_title.replace('/', '_').replace('\\', '_')
+            # Remove or replace problematic chars
+            safe_title = safe_title.replace('?', '').replace('*', '').replace(':', '_')
+            safe_title = safe_title.replace('<', '').replace('>', '').replace('|', '_')
+            # Handle all quote types (straight, smart, etc)
+            safe_title = safe_title.replace('"', '').replace('"', '').replace('"', '')  # Smart quotes
+            safe_title = safe_title.replace("'", '').replace("'", '').replace("'", '')  # Smart single quotes
+            safe_title = safe_title.replace('`', '').replace('´', '')
+            safe_title = safe_title.strip()
+            
+            safe_filename = safe_title[:200] + '.html'
             file_path = self.output_dir / safe_filename
             
             # Extract data with fallbacks
@@ -73,7 +91,9 @@ class AnimePageGenerator:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{self.escape_html(title)} - Anime Database</title>
+    <title>{self.escape_html(title)} - AnimeRepo v3.0</title>
+    <meta name="description" content="Stream {self.escape_html(title)} online. Get watching links, ratings, reviews and more on AnimeRepo.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {{
             margin: 0;
@@ -81,118 +101,232 @@ class AnimePageGenerator:
             box-sizing: border-box;
         }}
         
+        :root {{
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --text: #333;
+            --border: #e0e0e0;
+        }}
+        
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background: #f5f5f5;
+            color: var(--text);
+            line-height: 1.6;
+        }}
+        
+        .navbar {{
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }}
+        
+        .nav-back {{
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }}
+        
+        .nav-back a {{
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        .nav-back a:hover {{
+            color: var(--secondary);
         }}
         
         .container {{
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            padding: 30px 20px;
+        }}
+        
+        .hero {{
+            position: relative;
+            height: 300px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: flex-end;
+            color: white;
         }}
         
-        .header {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
+        .hero::before {{
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
         }}
         
-        .header a {{
-            color: white;
-            text-decoration: none;
-            margin-bottom: 20px;
-            display: inline-block;
+        .hero-content {{
+            position: relative;
+            z-index: 1;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 30px;
+            align-items: end;
+            width: 100%;
+        }}
+        
+        .hero-poster {{
+            width: 150px;
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }}
+        
+        .hero-poster img {{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }}
+        
+        .hero-title {{
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }}
+        
+        .hero-subtitle {{
+            opacity: 0.9;
             font-size: 14px;
         }}
         
-        .header-title {{
-            font-size: 32px;
-            font-weight: bold;
-            margin: 20px 0;
-        }}
-        
-        .content {{
+        .main-grid {{
             display: grid;
             grid-template-columns: 300px 1fr;
             gap: 30px;
-            padding: 30px;
+            margin-bottom: 40px;
         }}
         
         .sidebar {{
-            text-align: center;
-        }}
-        
-        .poster {{
-            width: 100%;
-            max-width: 250px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }}
-        
-        .meta-section {{
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: left;
-        }}
-        
-        .meta-label {{
-            font-weight: bold;
-            color: #667eea;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }}
-        
-        .meta-value {{
-            font-size: 14px;
-            color: #333;
-        }}
-        
-        .main {{
             display: flex;
             flex-direction: column;
             gap: 20px;
         }}
         
-        .section {{
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
+        .info-card {{
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }}
         
-        .section:last-child {{
-            border-bottom: none;
-        }}
-        
-        .section-title {{
-            font-size: 18px;
+        .info-card-title {{
+            font-size: 12px;
             font-weight: bold;
-            color: #333;
+            color: var(--primary);
+            text-transform: uppercase;
             margin-bottom: 10px;
         }}
         
-        .score-display {{
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #fff3cd;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: #856404;
+        .info-card-value {{
+            font-size: 16px;
+            color: var(--text);
+            font-weight: 500;
+        }}
+        
+        .score-card {{
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
         }}
         
         .score-value {{
-            font-size: 24px;
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }}
+        
+        .score-label {{
+            opacity: 0.9;
+            font-size: 12px;
+        }}
+        
+        .action-buttons {{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }}
+        
+        .btn {{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }}
+        
+        .btn-primary {{
+            background: var(--primary);
+            color: white;
+        }}
+        
+        .btn-primary:hover {{
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }}
+        
+        .btn-secondary {{
+            background: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }}
+        
+        .btn-secondary:hover {{
+            border-color: var(--primary);
+            color: var(--primary);
+        }}
+        
+        .content {{
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }}
+        
+        .section {{
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }}
+        
+        .section-title {{
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+        
+        .section-title i {{
+            color: var(--primary);
         }}
         
         .tags {{
@@ -202,124 +336,268 @@ class AnimePageGenerator:
         }}
         
         .tag {{
-            display: inline-block;
             background: #e9ecef;
             color: #495057;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 500;
         }}
         
-        .sources {{
+        .tag:hover {{
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+        }}
+        
+        .links-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }}
+        
+        .link-card {{
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+            background: white;
+        }}
+        
+        .link-card:hover {{
+            border-color: var(--primary);
+            background: #f8f9ff;
+            transform: translateY(-4px);
+        }}
+        
+        .link-card i {{
+            font-size: 24px;
+            color: var(--primary);
+            min-width: 30px;
+            text-align: center;
+        }}
+        
+        .link-card-content h4 {{
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }}
+        
+        .link-card-content p {{
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }}
+        
+        .share-buttons {{
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }}
         
-        .source-link {{
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 6px;
+        .share-btn {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             text-decoration: none;
-            font-size: 12px;
+            color: white;
             transition: all 0.3s;
         }}
         
-        .source-link:hover {{
-            background: #764ba2;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        .share-btn:hover {{
+            transform: scale(1.1);
+        }}
+        
+        .share-twitter {{
+            background: #1DA1F2;
+        }}
+        
+        .share-facebook {{
+            background: #1877F2;
+        }}
+        
+        .share-reddit {{
+            background: #FF4500;
+        }}
+        
+        .share-copy {{
+            background: #666;
+        }}
+        
+        .footer-section {{
+            background: var(--dark);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 40px;
+        }}
+        
+        .footer-section a {{
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 15px;
+        }}
+        
+        .footer-section a:hover {{
+            text-decoration: underline;
         }}
         
         @media (max-width: 768px) {{
-            .content {{
+            .hero {{
+                height: auto;
+                padding: 20px;
+            }}
+            
+            .hero-content {{
+                grid-template-columns: 1fr;
+                gap: 20px;
+                align-items: center;
+            }}
+            
+            .hero-title {{
+                font-size: 24px;
+            }}
+            
+            .main-grid {{
                 grid-template-columns: 1fr;
             }}
             
-            .header-title {{
-                font-size: 24px;
+            .hero-poster {{
+                display: none;
+            }}
+            
+            .navbar {{
+                flex-direction: column;
+                gap: 10px;
             }}
         }}
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <div class="nav-back">
+            <a href="../index.html"><i class="fas fa-arrow-left"></i> Back to Database</a>
+        </div>
+    </div>
+    
     <div class="container">
-        <div class="header">
-            <a href="../index.html">← Back to Database</a>
-            <div class="header-title">{self.escape_html(title)}</div>
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-poster">
+                    {f'<img src="{picture}" alt="{self.escape_html(title)}">' if picture else '<div style="background:#ddd;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;"><i class="fas fa-film"></i></div>'}
+                </div>
+                <div>
+                    <div class="hero-title">{self.escape_html(title)}</div>
+                    <div class="hero-subtitle">{anime_type} • {episodes} episodes • {season.get('year', 'TBA')}</div>
+                </div>
+            </div>
         </div>
         
-        <div class="content">
+        <div class="main-grid">
             <div class="sidebar">
-                {f'<img src="{picture}" alt="{self.escape_html(title)}" class="poster">' if picture else '<div class="poster" style="background:#ddd;display:flex;align-items:center;justify-content:center;font-size:48px;">📺</div>'}
-                
-                <div class="meta-section">
-                    <div class="meta-label">Type</div>
-                    <div class="meta-value">{anime_type}</div>
+                <div class="info-card score-card">
+                    <div class="score-label">Community Rating</div>
+                    <div class="score-value">{score_avg:.1f}</div>
+                    <div class="score-label">/ 10.0</div>
                 </div>
                 
-                <div class="meta-section">
-                    <div class="meta-label">Episodes</div>
-                    <div class="meta-value">{episodes}</div>
+                <div class="info-card">
+                    <div class="info-card-title">Type</div>
+                    <div class="info-card-value">{anime_type}</div>
                 </div>
                 
-                <div class="meta-section">
-                    <div class="meta-label">Status</div>
-                    <div class="meta-value">{status}</div>
+                <div class="info-card">
+                    <div class="info-card-title">Episodes</div>
+                    <div class="info-card-value">{episodes}</div>
                 </div>
                 
-                {f'''<div class="meta-section">
-                    <div class="meta-label">Year</div>
-                    <div class="meta-value">{season.get('year', 'Unknown')}</div>
+                <div class="info-card">
+                    <div class="info-card-title">Status</div>
+                    <div class="info-card-value">{status}</div>
+                </div>
+                
+                {f'''<div class="info-card">
+                    <div class="info-card-title">Year</div>
+                    <div class="info-card-value">{season.get('year', 'N/A')}</div>
                 </div>''' if season.get('year') else ''}
                 
-                {f'''<div class="meta-section">
-                    <div class="meta-label">Season</div>
-                    <div class="meta-value">{season.get('season', 'Unknown')}</div>
+                {f'''<div class="info-card">
+                    <div class="info-card-title">Season</div>
+                    <div class="info-card-value">{season.get('season', 'N/A').title()}</div>
                 </div>''' if season.get('season') else ''}
                 
-                {f'<div class="meta-section"><div class="meta-label">Duration</div><div class="meta-value">{duration_mins} mins/ep</div></div>' if duration_mins else ''}
+                {f'<div class="info-card"><div class="info-card-title">Duration</div><div class="info-card-value">{duration_mins} min/ep</div></div>' if duration_mins else ''}
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="alert('Share this anime!')"><i class="fas fa-share-alt"></i> Share</button>
+                    <button class="btn btn-secondary" onclick="alert('Report issue!')"><i class="fas fa-flag"></i> Report</button>
+                </div>
             </div>
             
-            <div class="main">
-                <div class="section">
-                    <div class="section-title">Rating</div>
-                    <div class="score-display">
-                        <span class="score-value">{score_avg:.2f}</span>
-                        <span>/ 10</span>
-                    </div>
-                </div>
-                
+            <div class="content">
                 {f'''<div class="section">
-                    <div class="section-title">Studios</div>
+                    <div class="section-title"><i class="fas fa-building"></i> Studios</div>
                     <p>{', '.join([s.title() for s in studios]) or 'Unknown'}</p>
                 </div>''' if studios else ''}
                 
                 {f'''<div class="section">
-                    <div class="section-title">Producers</div>
+                    <div class="section-title"><i class="fas fa-handshake"></i> Producers</div>
                     <p>{', '.join([p.title() for p in producers]) or 'Unknown'}</p>
                 </div>''' if producers else ''}
                 
                 {f'''<div class="section">
-                    <div class="section-title">Genres & Tags</div>
+                    <div class="section-title"><i class="fas fa-tags"></i> Genres & Tags</div>
                     <div class="tags">
-                        {chr(10).join([f'<span class="tag">{self.escape_html(tag)}</span>' for tag in tags[:15]])}
+                        {chr(10).join([f'<span class="tag">{self.escape_html(tag)}</span>' for tag in self.filter_tags(tags)])}
                     </div>
                 </div>''' if tags else ''}
                 
                 {f'''<div class="section">
-                    <div class="section-title">Synonyms</div>
-                    <p>{', '.join(synonyms[:10]) or 'None'}</p>
-                </div>''' if synonyms else ''}
+                    <div class="section-title"><i class="fas fa-globe"></i> Other Names</div>
+                    <p>{', '.join(self.filter_english_synonyms(synonyms)) or 'None'}</p>
+                </div>''' if self.filter_english_synonyms(synonyms) else ''}
                 
                 <div class="section">
-                    <div class="section-title">External Links</div>
-                    <div class="sources">
-                        {chr(10).join([f'<a href="{source}" target="_blank" class="source-link">{self.extract_source_name(source)}</a>' for source in sources[:10]])}
+                    <div class="section-title"><i class="fas fa-stream"></i> Watch Online</div>
+                    <div class="links-grid">
+                        {chr(10).join([f'''<a href="{source}" target="_blank" class="link-card">
+                            <i class="fas fa-{self.get_icon_for_source(source)}"></i>
+                            <div class="link-card-content">
+                                <h4>{self.extract_source_name(source)}</h4>
+                                <p>Watch now</p>
+                            </div>
+                        </a>''' for source in sources[:6]])}
                     </div>
                 </div>
+                
+                <div class="section">
+                    <div class="section-title"><i class="fas fa-share"></i> Share This Anime</div>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text={{self.escape_html(title)}}&url={anime_type}" class="share-btn share-twitter" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={anime_type}" class="share-btn share-facebook" title="Share on Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://reddit.com/submit?title={{self.escape_html(title)}}" class="share-btn share-reddit" title="Share on Reddit"><i class="fab fa-reddit"></i></a>
+                        <button class="share-btn share-copy" onclick="alert('Link copied!')" title="Copy link"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-section">
+            <h3>Support AnimeRepo</h3>
+            <p style="margin: 10px 0 20px 0;">Help us keep this database free and ad-free!</p>
+            <div>
+                <a href="https://github.com/mTulsiram/AnimeRepo" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank"><i class="fas fa-bug"></i> Report Bug</a>
+                <a href="https://github.com/mTulsiram/AnimeRepo/discussions" target="_blank"><i class="fas fa-comments"></i> Support</a>
             </div>
         </div>
     </div>
@@ -336,6 +614,26 @@ class AnimePageGenerator:
             self.failed_pages += 1
             print(f"❌ Error generating page for {anime.get('title', 'Unknown')}: {e}")
             return False
+    
+    def is_mostly_english(self, text):
+        """Check if text is mostly in English (ASCII characters)"""
+        if not text:
+            return False
+        ascii_count = sum(1 for c in text if ord(c) < 128)
+        return ascii_count / len(text) > 0.7
+    
+    def filter_english_synonyms(self, synonyms):
+        """Filter synonyms to only English ones"""
+        if not synonyms:
+            return []
+        return [s for s in synonyms if self.is_mostly_english(s)][:8]
+    
+    def filter_tags(self, tags):
+        """Filter tags to only English ones"""
+        if not tags:
+            return []
+        english_tags = [t for t in tags if self.is_mostly_english(t)]
+        return english_tags[:15]
     
     def escape_html(self, text):
         """Escape HTML special characters"""
@@ -359,6 +657,23 @@ class AnimePageGenerator:
             return 'AniDB'
         else:
             return 'View'
+    
+    def get_icon_for_source(self, url):
+        """Get FontAwesome icon for source"""
+        if 'myanimelist' in url:
+            return 'tv'
+        elif 'anilist' in url:
+            return 'link'
+        elif 'anidb' in url:
+            return 'database'
+        elif 'kitsu' in url:
+            return 'film'
+        elif 'anime-planet' in url:
+            return 'globe'
+        elif 'animenewsnetwork' in url or 'ann' in url:
+            return 'newspaper'
+        else:
+            return 'external-link-alt'
     
     def generate_all(self, json_file, chunk_size=1000):
         """Generate pages in chunks"""
@@ -384,4 +699,4 @@ class AnimePageGenerator:
 
 if __name__ == '__main__':
     generator = AnimePageGenerator()
-    generator.generate_all('anime-offline-database-minified.json', chunk_size=5000)
+    generator.generate_all('anime-offline-database.jsonl', chunk_size=5000)

@@ -156,18 +156,32 @@ class AnimeDataProcessor:
         for source_name, filename in self.sources.items():
             print(f"\n📥 Processing {source_name}...")
             
-            data = self.load_source(filename)
+            # First try from parent directory
+            file_path = f'../{filename}'
+            data = None
+            try:
+                if Path(file_path).exists():
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+            except:
+                pass
+            
+            # If not found, try current directory
+            if data is None:
+                data = self.load_source(filename)
+            
             if isinstance(data, list):
                 anime_list = data
             elif isinstance(data, dict):
-                anime_list = data.get('data', [])
+                # Try multiple possible keys where anime data could be
+                anime_list = data.get('deadEntries', data.get('data', data.get('entries', [])))
             else:
                 print(f"   ⚠️  Unexpected format, skipping")
                 continue
             
             print(f"   Found {len(anime_list)} entries")
             
-            for anime in anime_list[:100]:  # Process up to 100 per source for now
+            for anime in anime_list:  # Process all anime from this source
                 try:
                     title = anime.get('title') or anime.get('name') or anime.get('romaji')
                     if not title:
