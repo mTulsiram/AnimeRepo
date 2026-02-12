@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stars*Collection! - Anime Database</title>
+    <title>Stars*Collection! - AnimeRepo v3.0</title>
+    <meta name="description" content="Stream Stars*Collection! online. Get watching links, ratings, reviews and more on AnimeRepo.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -11,118 +13,232 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --text: #333;
+            --border: #e0e0e0;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background: #f5f5f5;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-back a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-back a:hover {
+            color: var(--secondary);
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            padding: 30px 20px;
+        }
+        
+        .hero {
+            position: relative;
+            height: 300px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: flex-end;
+            color: white;
         }
         
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
         }
         
-        .header a {
-            color: white;
-            text-decoration: none;
-            margin-bottom: 20px;
-            display: inline-block;
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 30px;
+            align-items: end;
+            width: 100%;
+        }
+        
+        .hero-poster {
+            width: 150px;
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        .hero-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .hero-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .hero-subtitle {
+            opacity: 0.9;
             font-size: 14px;
         }
         
-        .header-title {
-            font-size: 32px;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-        
-        .content {
+        .main-grid {
             display: grid;
             grid-template-columns: 300px 1fr;
             gap: 30px;
-            padding: 30px;
+            margin-bottom: 40px;
         }
         
         .sidebar {
-            text-align: center;
-        }
-        
-        .poster {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-        
-        .meta-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        
-        .meta-label {
-            font-weight: bold;
-            color: #667eea;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        
-        .meta-value {
-            font-size: 14px;
-            color: #333;
-        }
-        
-        .main {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
         
-        .section {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        .section:last-child {
-            border-bottom: none;
-        }
-        
-        .section-title {
-            font-size: 18px;
+        .info-card-title {
+            font-size: 12px;
             font-weight: bold;
-            color: #333;
+            color: var(--primary);
+            text-transform: uppercase;
             margin-bottom: 10px;
         }
         
-        .score-display {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #fff3cd;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: #856404;
+        .info-card-value {
+            font-size: 16px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .score-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
         }
         
         .score-value {
-            font-size: 24px;
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .score-label {
+            opacity: 0.9;
+            font-size: 12px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--primary);
         }
         
         .tags {
@@ -132,105 +248,223 @@
         }
         
         .tag {
-            display: inline-block;
             background: #e9ecef;
             color: #495057;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 500;
         }
         
-        .sources {
+        .tag:hover {
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+        }
+        
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .link-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .link-card:hover {
+            border-color: var(--primary);
+            background: #f8f9ff;
+            transform: translateY(-4px);
+        }
+        
+        .link-card i {
+            font-size: 24px;
+            color: var(--primary);
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .link-card-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .link-card-content p {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .share-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
         
-        .source-link {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 6px;
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             text-decoration: none;
-            font-size: 12px;
+            color: white;
             transition: all 0.3s;
         }
         
-        .source-link:hover {
-            background: #764ba2;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        .share-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .share-twitter {
+            background: #1DA1F2;
+        }
+        
+        .share-facebook {
+            background: #1877F2;
+        }
+        
+        .share-reddit {
+            background: #FF4500;
+        }
+        
+        .share-copy {
+            background: #666;
+        }
+        
+        .footer-section {
+            background: var(--dark);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .footer-section a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        
+        .footer-section a:hover {
+            text-decoration: underline;
         }
         
         @media (max-width: 768px) {
-            .content {
+            .hero {
+                height: auto;
+                padding: 20px;
+            }
+            
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                align-items: center;
+            }
+            
+            .hero-title {
+                font-size: 24px;
+            }
+            
+            .main-grid {
                 grid-template-columns: 1fr;
             }
             
-            .header-title {
-                font-size: 24px;
+            .hero-poster {
+                display: none;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <div class="nav-back">
+            <a href="../index.html"><i class="fas fa-arrow-left"></i> Back to Database</a>
+        </div>
+    </div>
+    
     <div class="container">
-        <div class="header">
-            <a href="../index.html">← Back to Database</a>
-            <div class="header-title">Stars*Collection!</div>
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-poster">
+                    <img src="https://cdn.myanimelist.net/images/anime/1261/120889.jpg" alt="Stars*Collection!">
+                </div>
+                <div>
+                    <div class="hero-title">Stars*Collection!</div>
+                    <div class="hero-subtitle">ONA • 61 episodes • 2022</div>
+                </div>
+            </div>
         </div>
         
-        <div class="content">
+        <div class="main-grid">
             <div class="sidebar">
-                <img src="https://cdn.myanimelist.net/images/anime/1261/120889.jpg" alt="Stars*Collection!" class="poster">
-                
-                <div class="meta-section">
-                    <div class="meta-label">Type</div>
-                    <div class="meta-value">ONA</div>
+                <div class="info-card score-card">
+                    <div class="score-label">Community Rating</div>
+                    <div class="score-value">6.9</div>
+                    <div class="score-label">/ 10.0</div>
                 </div>
                 
-                <div class="meta-section">
-                    <div class="meta-label">Episodes</div>
-                    <div class="meta-value">61</div>
+                <div class="info-card">
+                    <div class="info-card-title">Type</div>
+                    <div class="info-card-value">ONA</div>
                 </div>
                 
-                <div class="meta-section">
-                    <div class="meta-label">Status</div>
-                    <div class="meta-value">FINISHED</div>
+                <div class="info-card">
+                    <div class="info-card-title">Episodes</div>
+                    <div class="info-card-value">61</div>
                 </div>
                 
-                <div class="meta-section">
-                    <div class="meta-label">Year</div>
-                    <div class="meta-value">2022</div>
+                <div class="info-card">
+                    <div class="info-card-title">Status</div>
+                    <div class="info-card-value">FINISHED</div>
                 </div>
                 
-                <div class="meta-section">
-                    <div class="meta-label">Season</div>
-                    <div class="meta-value">WINTER</div>
+                <div class="info-card">
+                    <div class="info-card-title">Year</div>
+                    <div class="info-card-value">2022</div>
                 </div>
                 
-                <div class="meta-section"><div class="meta-label">Duration</div><div class="meta-value">2 mins/ep</div></div>
+                <div class="info-card">
+                    <div class="info-card-title">Season</div>
+                    <div class="info-card-value">Winter</div>
+                </div>
+                
+                <div class="info-card"><div class="info-card-title">Duration</div><div class="info-card-value">2 min/ep</div></div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="alert('Share this anime!')"><i class="fas fa-share-alt"></i> Share</button>
+                    <button class="btn btn-secondary" onclick="alert('Report issue!')"><i class="fas fa-flag"></i> Report</button>
+                </div>
             </div>
             
-            <div class="main">
+            <div class="content">
                 <div class="section">
-                    <div class="section-title">Rating</div>
-                    <div class="score-display">
-                        <span class="score-value">6.90</span>
-                        <span>/ 10</span>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">Studios</div>
+                    <div class="section-title"><i class="fas fa-building"></i> Studios</div>
                     <p>Cover Corp, Hololive Production</p>
                 </div>
                 
                 
                 
                 <div class="section">
-                    <div class="section-title">Genres & Tags</div>
+                    <div class="section-title"><i class="fas fa-tags"></i> Genres & Tags</div>
                     <div class="tags">
                         <span class="tag">anachronism</span>
 <span class="tag">cg animation</span>
@@ -251,19 +485,63 @@
                 </div>
                 
                 <div class="section">
-                    <div class="section-title">Synonyms</div>
+                    <div class="section-title"><i class="fas fa-globe"></i> Other Names</div>
                     <p>StarColle, Stars*Collection, stars*collection, stars*collection!</p>
                 </div>
                 
                 <div class="section">
-                    <div class="section-title">External Links</div>
-                    <div class="sources">
-                        <a href="https://anilist.co/anime/144451" target="_blank" class="source-link">AniList</a>
-<a href="https://anime-planet.com/anime/stars-collection" target="_blank" class="source-link">Anime Planet</a>
-<a href="https://kitsu.app/anime/45805" target="_blank" class="source-link">Kitsu</a>
-<a href="https://myanimelist.net/anime/50934" target="_blank" class="source-link">MyAnimeList</a>
+                    <div class="section-title"><i class="fas fa-stream"></i> Watch Online</div>
+                    <div class="links-grid">
+                        <a href="https://anilist.co/anime/144451" target="_blank" class="link-card">
+                            <i class="fas fa-link"></i>
+                            <div class="link-card-content">
+                                <h4>AniList</h4>
+                                <p>Watch now</p>
+                            </div>
+                        </a>
+<a href="https://anime-planet.com/anime/stars-collection" target="_blank" class="link-card">
+                            <i class="fas fa-globe"></i>
+                            <div class="link-card-content">
+                                <h4>Anime Planet</h4>
+                                <p>Watch now</p>
+                            </div>
+                        </a>
+<a href="https://kitsu.app/anime/45805" target="_blank" class="link-card">
+                            <i class="fas fa-film"></i>
+                            <div class="link-card-content">
+                                <h4>Kitsu</h4>
+                                <p>Watch now</p>
+                            </div>
+                        </a>
+<a href="https://myanimelist.net/anime/50934" target="_blank" class="link-card">
+                            <i class="fas fa-tv"></i>
+                            <div class="link-card-content">
+                                <h4>MyAnimeList</h4>
+                                <p>Watch now</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
+                
+                <div class="section">
+                    <div class="section-title"><i class="fas fa-share"></i> Share This Anime</div>
+                    <div class="share-buttons">
+                        <a href="https://twitter.com/intent/tweet?text={self.escape_html(title)}&url=ONA" class="share-btn share-twitter" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=ONA" class="share-btn share-facebook" title="Share on Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://reddit.com/submit?title={self.escape_html(title)}" class="share-btn share-reddit" title="Share on Reddit"><i class="fab fa-reddit"></i></a>
+                        <button class="share-btn share-copy" onclick="alert('Link copied!')" title="Copy link"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-section">
+            <h3>Support AnimeRepo</h3>
+            <p style="margin: 10px 0 20px 0;">Help us keep this database free and ad-free!</p>
+            <div>
+                <a href="https://github.com/mTulsiram/AnimeRepo" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank"><i class="fas fa-bug"></i> Report Bug</a>
+                <a href="https://github.com/mTulsiram/AnimeRepo/discussions" target="_blank"><i class="fas fa-comments"></i> Support</a>
             </div>
         </div>
     </div>
