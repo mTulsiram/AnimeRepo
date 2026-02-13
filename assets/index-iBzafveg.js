@@ -1,0 +1,46 @@
+import{p as T}from"./pako.esm-DwGzBETv.js";(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))l(s);new MutationObserver(s=>{for(const o of s)if(o.type==="childList")for(const r of o.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&l(r)}).observe(document,{childList:!0,subtree:!0});function n(s){const o={};return s.integrity&&(o.integrity=s.integrity),s.referrerPolicy&&(o.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?o.credentials="include":s.crossOrigin==="anonymous"?o.credentials="omit":o.credentials="same-origin",o}function l(s){if(s.ep)return;s.ep=!0;const o=n(s);fetch(s.href,o)}})();function j(e){if(!e||typeof e!="string")return"Unknown.html";let t=e.replace(/\//g,"_").replace(/\\/g,"_").replace(/\?/g,"").replace(/\*/g,"").replace(/:/g,"_").replace(/</g,"").replace(/>/g,"").replace(/\|/g,"_").replace(/["\u201C\u201D\u201F]/g,"").replace(/['\u2018\u2019\u201A\u2032]/g,"").replace(/`/g,"").replace(/\u00B4/g,"").trim();return t=t.slice(0,200),t?t+".html":"Unknown.html"}function _(e){return"anime/"+encodeURIComponent(j(e))}let w={english_dubbed:[],hindi_dubbed:[]};function O(e){const t=(e||"").trim(),n=(w.english_dubbed||[]).indexOf(t)>=0,l=(w.hindi_dubbed||[]).indexOf(t)>=0;return n&&l?["English Dubbed","Hindi Dubbed"]:n?["English Dubbed"]:l?["Hindi Dubbed"]:["Subtitled"]}const H="anime-offline-database-minified.json",N="language_dubs.json";async function B(){const[e,t]=await Promise.all([fetch(H),fetch(N).catch(()=>null)]);if(!e.ok)throw new Error("Failed to load anime data");const n=await e.json(),l=Array.isArray(n)?n:n.data||n.anime||[];return t&&t.ok&&(w=await t.json()),l}function p(e){if(e==null)return"";const t=document.createElement("div");return t.textContent=String(e),t.innerHTML}function D(e,t){const{type:n,genre:l,yearVal:s,status:o,language:r,searchQuery:c}=t;return e.filter(a=>{if(c){const d=c.toLowerCase(),f=(a.title||"").toLowerCase().includes(d),M=(a.synonyms||[]).some($=>String($).toLowerCase().includes(d));if(!f&&!M)return!1}if(n&&a.type!==n)return!1;const m=a.tags||[];if(!(!l||m.some(d=>String(d).toLowerCase().includes(l.toLowerCase()))))return!1;if(s){const d=a.animeSeason&&a.animeSeason.year!=null?Number(a.animeSeason.year):0,f=parseInt(s,10);if(s.length===4){if(f>=1990&&f<2010){if(d<f||d>=f+10)return!1}else if(f>=2010&&f<2030){if(d<f||d>=f+10)return!1}else if(d!==f)return!1}else if(d!=s)return!1}if(o&&a.status!==o)return!1;const h=O(a.title);return!(r==="English"&&!h.some(d=>d.toLowerCase().includes("english"))||r==="Hindi"&&!h.some(d=>d.toLowerCase().includes("hindi"))||r==="Subtitled"&&!h.some(d=>d.toLowerCase().includes("subtitled")))})}function A(e,t){const n=document.createElement("a");n.href=URL.createObjectURL(e),n.download=t,n.click(),URL.revokeObjectURL(n.href)}function P(e){const t=[],n=(s,o)=>{o!=null&&o!==""&&t.push(`${s}:${String(o).replace(/\n/g," ")}`)};n("title",e.title),n("type",e.type),n("episodes",e.episodes),n("status",e.status),e.animeSeason&&(n("year",e.animeSeason.year),n("season",e.animeSeason.season));const l=e.score&&typeof e.score=="object"?e.score.arithmeticMean:e.score;return n("score",l),e.picture&&n("picture",e.picture),e.synonyms&&e.synonyms.length&&n("synonyms",e.synonyms.join("|")),e.tags&&e.tags.length&&n("tags",e.tags.slice(0,20).join("|")),e.sources&&e.sources.length&&n("sources",e.sources.join("|")),t.join(`
+`)}function U(e,t=!0){const n=P(e),s=`anime-${(e.title||"anime").replace(/[^a-zA-Z0-9-_]/g,"-").slice(0,60)}.txt`,r=new TextEncoder().encode(n);if(t){const c=T.gzip(r,{level:9}),a=new Blob([c],{type:"application/gzip"});A(a,s+".gz")}else{const c=new Blob([r],{type:"text/plain"});A(c,s)}}let u=null;function I(){const e=document.getElementById("modal-root");if(!e)return null;const t=document.createElement("div");return t.className="modal-overlay",t.setAttribute("role","dialog"),t.setAttribute("aria-modal","true"),t.setAttribute("aria-labelledby","modal-title"),t.innerHTML=`
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Anime</h2>
+        <button type="button" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" id="modal-download-data">
+          <i class="fas fa-file-archive"></i> Download data (.txt.gz)
+        </button>
+        <a href="#" class="btn btn-secondary" id="modal-full-page" target="_blank" rel="noopener">
+          <i class="fas fa-external-link-alt"></i> Open full page
+        </a>
+      </div>
+    </div>
+  `,e.appendChild(t),u=t,t.querySelector(".modal-close").addEventListener("click",E),t.addEventListener("click",n=>{n.target===t&&E()}),document.addEventListener("keydown",x),t}function x(e){e.key==="Escape"&&u&&E()}function E(){u&&(document.removeEventListener("keydown",x),u.remove(),u=null)}function R(e){const t=e.score&&typeof e.score=="object"?e.score.arithmeticMean:e.score,n=e.animeSeason||{},l=e.episodes??"?",s=e.type||"—",o=n.year||"—",r=(e.tags||[]).slice(0,10).join(", ")||"—",c=(e.synonyms||[]).slice(0,3).join(", ")||"—",a=u.querySelector(".modal-body");a.innerHTML="";const m=e.picture?`<img class="modal-poster" src="${p(e.picture)}" alt="" loading="lazy" onerror="this.style.display='none'">`:"";a.innerHTML=`
+    ${m}
+    <p class="modal-meta">${p(s)} · ${l} eps · ${o}</p>
+    <dl class="modal-dl">
+      <dt>Score</dt>
+      <dd>${t!=null?Number(t).toFixed(1):"—"}/10</dd>
+      <dt>Tags</dt>
+      <dd>${p(r)}</dd>
+      <dt>Other names</dt>
+      <dd>${p(c)}</dd>
+    </dl>
+  `;const C=u.querySelector("#modal-title");C.textContent=e.title||"Anime";const h=u.querySelector("#modal-full-page");h.href=_(e.title);const d=u.querySelector("#modal-download-data");d.onclick=()=>{U(e,!0)}}function q(e){u||I(),u&&(R(e),u.style.display="flex",u.querySelector(".modal-close").focus())}let g=[],y=[],b=1;const S=24,i=e=>document.getElementById(e);function F(e){const t=i("loading");t&&(t.style.display=e?"block":"none")}function v(){const e=i("animeGrid"),t=(b-1)*S,n=t+S,l=y.slice(t,n);if(l.length===0){e.innerHTML="";const r=i("emptyState");r&&(r.style.display="block");const c=i("resultCount");c&&(c.textContent="0"),k(0);return}const s=i("emptyState");s&&(s.style.display="none"),e.innerHTML=l.map(r=>`
+    <article class="anime-card" role="listitem" data-anime-index="${g.indexOf(r)}">
+      <div class="anime-poster">
+        ${r.picture?`<img src="${p(r.picture)}" alt="" loading="lazy" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='flex';"><i class="fas fa-film poster-fallback" aria-hidden="true"></i>`:'<i class="fas fa-film" aria-hidden="true"></i>'}
+      </div>
+      <div class="anime-info">
+        <div class="anime-title">${p(r.title)}</div>
+        <div class="anime-meta">
+          <span>${r.type||"—"}</span>
+          <span>${r.episodes??"?"} eps</span>
+        </div>
+        <div class="anime-rating">
+          <i class="fas fa-star"></i>
+          ${r.score?.arithmeticMean!=null?Number(r.score.arithmeticMean).toFixed(1):"N/A"}
+        </div>
+      </div>
+    </article>
+  `).join("");const o=i("resultCount");o&&(o.textContent=y.length),k(y.length),e.querySelectorAll(".anime-card").forEach((r,c)=>{const a=l[c];r.addEventListener("click",m=>{m.preventDefault(),q(a)})})}function k(e){const t=i("pagination");t.innerHTML="";const n=Math.ceil(e/S);if(n<=1)return;const l=10;for(let s=1;s<=Math.min(n,l);s++){const o=document.createElement("button");o.type="button",o.className=`page-btn ${s===b?"active":""}`,o.textContent=s,o.addEventListener("click",()=>{b=s,v(),window.scrollTo({top:0,behavior:"smooth"})}),t.appendChild(o)}}function L(){b=1;const e=i("searchInput")&&i("searchInput").value||"";y=D(g,{type:i("typeFilter")&&i("typeFilter").value||"",genre:i("genreFilter")&&i("genreFilter").value||"",yearVal:i("yearFilter")&&i("yearFilter").value||"",status:i("statusFilter")&&i("statusFilter").value||"",language:i("languageFilter")&&i("languageFilter").value||"",searchQuery:e}),v()}function z(){const e=["typeFilter","genreFilter","yearFilter","statusFilter","languageFilter"];e.forEach(c=>{const a=i(c);a&&a.addEventListener("change",L)});const t=i("searchBtn"),n=i("searchInput");t&&t.addEventListener("click",L),n&&n.addEventListener("keypress",c=>{c.key==="Enter"&&L()});const l=i("clearFilters");l&&l.addEventListener("click",()=>{e.forEach(c=>{const a=i(c);a&&(a.value="")}),n&&(n.value=""),y=g,b=1,v()});const s=i("gridView"),o=i("listView"),r=i("animeGrid");s&&s.addEventListener("click",()=>{s.classList.add("active"),o?.classList.remove("active"),r?.classList.remove("list-view")}),o&&o.addEventListener("click",()=>{o.classList.add("active"),s?.classList.remove("active"),r?.classList.add("list-view")})}async function G(){F(!0);try{g=await B(),y=g;const e=i("statCount");e&&(e.textContent=g.length.toLocaleString()+"+"),z(),v()}catch(e){console.error(e);const t=i("loading");t&&(t.innerHTML='<p style="color:red;">Failed to load data. Check console.</p>')}finally{F(!1)}}G();

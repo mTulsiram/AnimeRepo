@@ -352,6 +352,16 @@
             object-fit: cover;
         }
 
+        .anime-poster .poster-fallback {
+            display: none;
+            position: absolute;
+            inset: 0;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: rgba(255,255,255,0.8);
+        }
+
         .anime-info {
             padding: 15px;
             flex: 1;
@@ -506,22 +516,94 @@
             color: var(--border);
         }
 
+        /* List view */
+        .anime-grid.list-view {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .anime-grid.list-view .anime-card-link {
+            flex-direction: row;
+        }
+
+        .anime-grid.list-view .anime-card {
+            flex-direction: row;
+            max-height: 100px;
+        }
+
+        .anime-grid.list-view .anime-poster {
+            width: 70px;
+            min-width: 70px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+
+        .anime-grid.list-view .anime-info {
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .anime-grid.list-view .anime-title {
+            -webkit-line-clamp: 1;
+            width: 100%;
+        }
+
+        .anime-grid.list-view .anime-meta,
+        .anime-grid.list-view .anime-rating {
+            margin-top: 0;
+        }
+
+        /* Touch-friendly and prevent iOS zoom */
+        .search-input, .filter-select, .filter-input {
+            font-size: 16px;
+            min-height: 44px;
+        }
+
+        .search-btn, .page-btn, .view-btn {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
+            .hero {
+                padding: 40px 16px;
+            }
+
             .hero h1 {
-                font-size: 32px;
+                font-size: 28px;
+            }
+
+            .hero-subtitle {
+                font-size: 14px;
             }
 
             .hero-stats {
-                gap: 20px;
+                gap: 16px;
             }
 
             .stat-number {
-                font-size: 24px;
+                font-size: 22px;
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+
+            .filters-section {
+                padding: 20px 16px;
             }
 
             .filter-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                flex-direction: column;
             }
 
             .results-header {
@@ -531,8 +613,12 @@
             }
 
             .anime-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 12px;
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 14px;
+            }
+
+            .anime-poster {
+                height: 190px;
             }
 
             .nav-links {
@@ -542,6 +628,31 @@
             .navbar-content {
                 justify-content: flex-start;
             }
+
+            .navbar {
+                padding: 12px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .anime-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .anime-poster {
+                height: 160px;
+            }
+        }
+
+        /* Safe area for notched devices */
+        .navbar, .hero, .container, .footer {
+            padding-left: max(env(safe-area-inset-left), 20px);
+            padding-right: max(env(safe-area-inset-right), 20px);
         }
     </style>
 </head>
@@ -689,7 +800,7 @@
         </div>
 
         <!-- Anime Grid -->
-        <div class="anime-grid" id="animeGrid"></div>
+        <div class="anime-grid" id="animeGrid" role="list"></div>
 
         <!-- Loading -->
         <div class="loading" id="loading" style="display: none;">
@@ -748,13 +859,39 @@
         let currentPage = 1;
         const itemsPerPage = 24;
 
-        // Load anime data from JSON
+        // Match Python generate_anime_pages.py safe filename logic so links point to actual files
+        function titleToFilename(title) {
+            if (!title || typeof title !== 'string') return 'Unknown.html';
+            let s = title
+                .replace(/\//g, '_').replace(/\\/g, '_')
+                .replace(/\?/g, '').replace(/\*/g, '').replace(/:/g, '_')
+                .replace(/</g, '').replace(/>/g, '').replace(/\|/g, '_')
+                .replace(/["\u201C\u201D\u201F]/g, '').replace(/['\u2018\u2019\u201A\u2032]/g, '')
+                .replace(/`/g, '').replace(/\u00B4/g, '')
+                .trim();
+            s = s.slice(0, 200);
+            return s ? s + '.html' : 'Unknown.html';
+        }
+
+        function getAnimePageUrl(title) {
+            return 'anime/' + encodeURIComponent(titleToFilename(title));
+        }
+
+        let languageDubs = { english_dubbed: [], hindi_dubbed: [] };
+
+        // Load anime data from JSON and language dubs for filter
         async function loadAnimeData() {
             try {
                 document.getElementById('loading').style.display = 'block';
-                const response = await fetch('anime-offline-database-minified.json');
-                const data = await response.json();
-                allAnime = data.data || data;
+                const [dataRes, langRes] = await Promise.all([
+                    fetch('anime-offline-database-minified.json'),
+                    fetch('language_dubs.json').catch(() => null)
+                ]);
+                const data = await dataRes.json();
+                allAnime = Array.isArray(data) ? data : (data.data || data.anime || []);
+                if (langRes && langRes.ok) {
+                    languageDubs = await langRes.json();
+                }
                 filteredAnime = allAnime;
                 displayAnime();
                 document.getElementById('loading').style.display = 'none';
@@ -780,10 +917,10 @@
 
             document.getElementById('emptyState').style.display = 'none';
             grid.innerHTML = pageAnime.map(anime => `
-                <a href="anime/${encodeURIComponent(anime.title)}.html" class="anime-card-link">
+                <a href="${getAnimePageUrl(anime.title)}" class="anime-card-link">
                     <div class="anime-card">
                         <div class="anime-poster">
-                            ${anime.picture ? `<img src="${anime.picture}" alt="${anime.title}">` : '<i class="fas fa-film"></i>'}
+                            ${anime.picture ? `<img src="${escapeHtml(anime.picture)}" alt="" loading="lazy" onerror="this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';"><i class="fas fa-film poster-fallback" aria-hidden="true"></i>` : '<i class="fas fa-film" aria-hidden="true"></i>'}
                         </div>
                         <div class="anime-info">
                             <div class="anime-title">${escapeHtml(anime.title)}</div>
@@ -832,20 +969,45 @@
             }
         }
 
+        function getAnimeLanguages(title) {
+            const t = (title || '').trim();
+            const eng = (languageDubs.english_dubbed || []).indexOf(t) >= 0;
+            const hin = (languageDubs.hindi_dubbed || []).indexOf(t) >= 0;
+            if (eng && hin) return ['English Dubbed', 'Hindi Dubbed'];
+            if (eng) return ['English Dubbed'];
+            if (hin) return ['Hindi Dubbed'];
+            return ['Subtitled'];
+        }
+
         function applyFilters() {
             currentPage = 1;
             const type = document.getElementById('typeFilter').value;
             const genre = document.getElementById('genreFilter').value;
-            const year = document.getElementById('yearFilter').value;
+            const yearVal = document.getElementById('yearFilter').value;
             const status = document.getElementById('statusFilter').value;
             const language = document.getElementById('languageFilter').value;
 
             filteredAnime = allAnime.filter(anime => {
                 if (type && anime.type !== type) return false;
-                if (genre && !anime.tags?.some(t => t.toLowerCase().includes(genre.toLowerCase()))) return false;
-                if (year && anime.animeSeason?.year != year) return false;
+                const tags = anime.tags || [];
+                const genreMatch = !genre || tags.some(t => String(t).toLowerCase().includes(genre.toLowerCase()));
+                if (!genreMatch) return false;
+                if (yearVal) {
+                    const y = anime.animeSeason && (anime.animeSeason.year != null) ? Number(anime.animeSeason.year) : 0;
+                    if (yearVal.length === 4) {
+                        const decade = parseInt(yearVal, 10);
+                        if (decade >= 1990 && decade < 2010) {
+                            if (y < decade || y >= decade + 10) return false;
+                        } else if (decade >= 2010 && decade < 2030) {
+                            if (y < decade || y >= decade + 10) return false;
+                        } else if (y != decade) return false;
+                    } else if (y != yearVal) return false;
+                }
                 if (status && anime.status !== status) return false;
-                if (language && !anime.languages?.some(l => l.toLowerCase().includes(language.toLowerCase()))) return false;
+                const langs = getAnimeLanguages(anime.title);
+                if (language === 'English' && !langs.some(l => l.toLowerCase().includes('english'))) return false;
+                if (language === 'Hindi' && !langs.some(l => l.toLowerCase().includes('hindi'))) return false;
+                if (language === 'Subtitled' && !langs.some(l => l.toLowerCase().includes('subtitled'))) return false;
                 return true;
             });
 
@@ -869,7 +1031,11 @@
             document.getElementById('genreFilter').value = '';
             document.getElementById('yearFilter').value = '';
             document.getElementById('statusFilter').value = '';
-            applyFilters();
+            document.getElementById('languageFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            filteredAnime = allAnime;
+            currentPage = 1;
+            displayAnime();
         }
 
         function resetSearch() {
@@ -878,10 +1044,11 @@
         }
 
         function changeView(view) {
-            // Toggle between grid and list view
             document.getElementById('gridView').classList.toggle('active', view === 'grid');
             document.getElementById('listView').classList.toggle('active', view === 'list');
-            // Can be extended for different layout styles
+            const grid = document.getElementById('animeGrid');
+            if (view === 'list') grid.classList.add('list-view');
+            else grid.classList.remove('list-view');
         }
 
         function escapeHtml(text) {
