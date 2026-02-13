@@ -1,6 +1,14 @@
-# AnimeRepo v4.0.0 Release Notes
+# AnimeRepo v4 Release Notes
 
-## Summary
+## v4.0.1 (latest)
+
+- **UI polish** – DM Sans font, updated indigo/violet palette, improved hero subtitle and footer.
+- **Cards** – 12px radius, hover shadow, clearer “Where to watch” messaging.
+- **README** – Full rewrite: features, data sources, where to watch (legal only), tech stack, quick start.
+- **Modal** – “Where to watch & details” section with MAL/AniList/AniDB/Kitsu links + Search Crunchyroll / Find on JustWatch.
+- **Footer** – Data & watch links (anime-offline-database, Crunchyroll, JustWatch); “Metadata only; watch via linked legal services.”
+
+## v4.0.0
 
 - **Vite frontend** – All CSS and JS in separate files; no inline styles. Build with Bun or npm.
 - **Lightweight modal** – Click an anime to open a popup with data (no full page load).
@@ -31,19 +39,11 @@ This makes up to 3 commits (frontend, built assets, remaining) and pushes once.
 
 ## Create GitHub release
 
-**Option A – Script (if GitHub CLI is installed):**
+**v4.0.1:** Run `.\release-v4.0.1.ps1` (or use GitHub UI with tag `v4.0.1`).
 
-```powershell
-.\release-v4.ps1
-```
+**v4.0.0:** Run `.\release-v4.ps1` or create release manually with tag `v4.0.0`.
 
-**Option B – Manual:**
-
-1. Open https://github.com/mTulsiram/AnimeRepo/releases/new
-2. Tag: `v4.0.0` (create from `main` if it doesn’t exist)
-3. Title: `v4.0.0 - Vite SPA, Bun support, modal + compressed data export`
-4. Paste this file or the summary above as the description
-5. Publish release
+**Manual:** Open https://github.com/mTulsiram/AnimeRepo/releases/new → choose tag → add title/description → Publish.
 
 ## Full automation (build + push + release)
 
@@ -53,4 +53,4 @@ From repo root:
 .\automate-v4.ps1
 ```
 
-Runs: build (Bun) → chunked push → optional release creation.
+Runs: build (Bun) → chunked push → optional release creation. For v4.0.1 use single-commit push then `.\release-v4.0.1.ps1`.

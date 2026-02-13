@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AnimeRepo v4 - 40K+ anime database. Lightweight data view, download compressed data, open full page.">
-  <title>AnimeRepo v4 - Anime Database</title>
+  <meta name="description" content="AnimeRepo - Free 40K+ anime database. Browse, filter, view details, and find where to watch. No backend, runs on GitHub Pages.">
+  <title>AnimeRepo - Anime Database</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/src/css/index.css">
 </head>
@@ -23,8 +26,8 @@
 
   <section class="hero" id="home">
     <div class="hero-content">
-      <h1>AnimeRepo v4</h1>
-      <p class="hero-subtitle">Discover 40K+ anime. View data in a popup, download compressed export, or open full page.</p>
+      <h1>AnimeRepo</h1>
+      <p class="hero-subtitle">Browse 40,000+ anime. Filter by language, genre, and year. Click any title for details and links to watch on legal streaming services.</p>
       <div class="hero-stats">
         <div class="stat"><div class="stat-number" id="statCount">—</div><div class="stat-label">Anime Titles</div></div>
         <div class="stat"><div class="stat-number">7+</div><div class="stat-label">Data Sources</div></div>
@@ -35,9 +38,9 @@
 
   <div class="container" id="browse">
     <div class="filters-section">
-      <div class="filters-title"><i class="fas fa-filter"></i> Filters</div>
+      <div class="filters-title"><i class="fas fa-filter"></i> Search & filters</div>
       <div class="search-container">
-        <input type="text" class="search-input" id="searchInput" placeholder="Search anime..." autocomplete="off">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by title (e.g. Death Note, Naruto)…" autocomplete="off">
         <button type="button" class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Search</button>
       </div>
       <div class="filter-grid">
@@ -127,18 +130,27 @@
     <div class="footer-content">
       <div class="footer-section">
         <h3>AnimeRepo</h3>
-        <p>Free anime database. Data in a popup, download as compressed file, or open full page.</p>
+        <p>Free, open-source anime database. No video hosting—we link to MyAnimeList, AniList, and legal streaming search (Crunchyroll, JustWatch).</p>
         <a href="https://github.com/mTulsiram/AnimeRepo" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
       </div>
       <div class="footer-section">
         <h3>Links</h3>
         <ul>
           <li><a href="#browse">Browse</a></li>
-          <li><a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank" rel="noopener">Report Bug</a></li>
+          <li><a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank" rel="noopener">Report bug</a></li>
+          <li><a href="https://github.com/mTulsiram/AnimeRepo/blob/main/README.md" target="_blank" rel="noopener">README</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Data &amp; watch</h3>
+        <ul>
+          <li><a href="https://github.com/manami-project/anime-offline-database" target="_blank" rel="noopener">anime-offline-database</a></li>
+          <li><a href="https://www.crunchyroll.com" target="_blank" rel="noopener">Crunchyroll</a></li>
+          <li><a href="https://www.justwatch.com" target="_blank" rel="noopener">JustWatch</a></li>
         </ul>
       </div>
     </div>
-    <div class="footer-bottom">&copy; 2026 AnimeRepo</div>
+    <div class="footer-bottom">&copy; 2026 AnimeRepo · Metadata only; watch via linked legal services.</div>
   </footer>
 
   <div id="modal-root"></div>
