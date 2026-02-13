@@ -11,16 +11,19 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      input: {
-        index: resolve(__dirname, 'index.html'),
-        'anime-detail': resolve(__dirname, 'src/anime-detail-entry.js'),
-      },
+      input: [
+        resolve(__dirname, 'index.html'),
+        resolve(__dirname, 'anime-detail.html'),
+      ],
       output: {
-        entryFileNames: (chunkInfo) =>
-          chunkInfo.name === 'anime-detail' ? 'assets/anime-detail.js' : 'assets/[name]-[hash].js',
+        entryFileNames: (chunkInfo) => {
+          const name = chunkInfo?.name ?? 'chunk';
+          return name === 'anime-detail' ? 'assets/anime-detail.js' : 'assets/[name]-[hash].js';
+        },
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+          if (!assetInfo?.name) return 'assets/[name]-[hash][extname]';
+          if (assetInfo.name.endsWith('.css')) {
             return assetInfo.name.includes('anime-detail') ? 'assets/anime-detail.css' : 'assets/[name]-[hash][extname]';
           }
           return 'assets/[name]-[hash][extname]';

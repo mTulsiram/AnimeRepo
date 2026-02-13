@@ -10,10 +10,10 @@
     "copy-dist": "node scripts/copy-dist.js",
     "copy-dist:bun": "bun scripts/copy-dist.js",
     "deploy": "vite build && node scripts/copy-dist.js",
-    "deploy:bun": "vite build && bun scripts/copy-dist.js"
+    "deploy:bun": "bun scripts/clean-dist.js && vite build && bun scripts/copy-dist.js"
   },
   "devDependencies": {
-    "vite": "^5.4.0"
+    "vite": "^4.5.4"
   },
   "dependencies": {
     "pako": "^2.1.0"
