@@ -9,19 +9,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="assets/index-DIGnYX85.css">
+  
+  <script type="module" crossorigin src="./assets/index-1a290ba0.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/pako.esm-96f6146f.js">
+  <link rel="stylesheet" href="./assets/index-39e0f8b4.css">
 </head>
 <body>
   <nav class="navbar">
     <div class="navbar-content">
       <div class="logo"><i class="fas fa-film"></i> AnimeRepo</div>
-      <ul class="nav-links">
+      <ul class="nav-links" id="navLinks">
         <li><a href="#home">Home</a></li>
         <li><a href="#browse">Browse</a></li>
         <li><a href="https://github.com/mTulsiram/AnimeRepo" target="_blank" rel="noopener">GitHub</a></li>
         <li><a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank" rel="noopener">Support</a></li>
       </ul>
-      <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu"><i class="fas fa-bars"></i></button>
+      <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
     </div>
   </nav>
 
@@ -115,8 +118,8 @@
     <div class="results-header">
       <span class="results-count">Showing <strong id="resultCount">0</strong> anime</span>
       <div class="view-options">
-        <button type="button" class="view-btn active" id="gridView" aria-pressed="true"><i class="fas fa-th"></i> Grid</button>
-        <button type="button" class="view-btn" id="listView" aria-pressed="false"><i class="fas fa-list"></i> List</button>
+        <button type="button" class="view-btn active" id="gridView"><i class="fas fa-th"></i> Grid</button>
+        <button type="button" class="view-btn" id="listView"><i class="fas fa-list"></i> List</button>
       </div>
     </div>
 
@@ -159,28 +162,6 @@
 
   <div id="modal-root"></div>
 
-  <script>
-    (function() {
-      var t = document.getElementById('navToggle');
-      var n = document.getElementById('navLinks');
-      if (t && n) {
-        t.addEventListener('click', function() {
-          n.classList.toggle('open');
-          t.setAttribute('aria-expanded', n.classList.contains('open'));
-          var i = t.querySelector('i');
-          if (i) { i.className = n.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars'; }
-        });
-        n.querySelectorAll('a').forEach(function(a) {
-          a.addEventListener('click', function() {
-            n.classList.remove('open');
-            t.setAttribute('aria-expanded', 'false');
-            var i = t.querySelector('i');
-            if (i) i.className = 'fas fa-bars';
-          });
-        });
-      }
-    })();
-  </script>
-  <script type="module" src="assets/index-iBzafveg.js"></script>
+  
 </body>
 </html>
