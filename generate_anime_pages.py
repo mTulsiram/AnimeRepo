@@ -11,12 +11,13 @@ from urllib.parse import quote
 import sys
 
 class AnimePageGenerator:
-    def __init__(self, output_dir='anime'):
+    def __init__(self, output_dir='anime', minimal=False):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         self.generated_pages = 0
         self.failed_pages = 0
         self.language_dubs = self.load_language_dubs()
+        self.minimal = minimal  # If True, output minimal HTML + external CSS/JS (no inline styles)
     
     def load_language_dubs(self):
         """Load language dubs mapping"""
@@ -60,8 +61,62 @@ class AnimePageGenerator:
             print(f"❌ Error loading {jsonl_file}: {e}")
             return []
     
+    def generate_anime_page_minimal(self, anime):
+        """Generate minimal HTML: external CSS/JS, embedded JSON. No inline styles."""
+        try:
+            title = anime.get('title', 'Unknown')
+            safe_title = title.replace('/', '_').replace('\\', '_')
+            safe_title = safe_title.replace('?', '').replace('*', '').replace(':', '_')
+            safe_title = safe_title.replace('<', '').replace('>', '').replace('|', '_')
+            for q in '"\'"\u201c\u201d\u201f\u2018\u2019\u201a`\u00b4':
+                safe_title = safe_title.replace(q, '')
+            safe_title = safe_title.strip()[:200]
+            safe_filename = safe_title + '.html' if safe_title else 'Unknown.html'
+            file_path = self.output_dir / safe_filename
+
+            duration = anime.get('duration', {})
+            duration_secs = duration.get('value', 0) if isinstance(duration, dict) else 0
+            duration_mins = duration_secs // 60 if duration_secs else 0
+            score = anime.get('score', {})
+            score_avg = score.get('arithmeticMean', 0) if isinstance(score, dict) else 0
+            payload = {
+                'score_avg': score_avg,
+                'duration_mins': duration_mins,
+                'languages': self.get_anime_languages(title),
+            }
+            import json
+            payload_anime = dict(anime)
+            payload_anime['payload'] = payload
+            json_str = json.dumps(payload_anime, ensure_ascii=False).replace('</', '<\\/')
+
+            html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{self.escape_html(title)} - AnimeRepo</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../assets/anime-detail.css">
+</head>
+<body>
+<div id="anime-root"></div>
+<script type="application/json" id="anime-data">{json_str}</script>
+<script src="../assets/anime-detail.js"></script>
+</body>
+</html>'''
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(html)
+            self.generated_pages += 1
+            return True
+        except Exception as e:
+            self.failed_pages += 1
+            print(f"❌ Minimal page failed for {anime.get('title', 'Unknown')}: {e}")
+            return False
+
     def generate_anime_page(self, anime):
         """Generate HTML page for a single anime"""
+        if self.minimal:
+            return self.generate_anime_page_minimal(anime)
         try:
             title = anime.get('title', 'Unknown')
             
@@ -724,5 +779,10 @@ class AnimePageGenerator:
         return self.generated_pages
 
 if __name__ == '__main__':
-    generator = AnimePageGenerator()
-    generator.generate_all('anime-offline-database.jsonl', chunk_size=5000)
+    import argparse
+    p = argparse.ArgumentParser(description='Generate anime HTML pages')
+    p.add_argument('--minimal', action='store_true', help='Minimal HTML + external assets (anime-detail.js/css), no inline styles')
+    p.add_argument('--jsonl', default='anime-offline-database.jsonl', help='JSONL data file')
+    args = p.parse_args()
+    generator = AnimePageGenerator(minimal=args.minimal)
+    generator.generate_all(args.jsonl, chunk_size=5000)

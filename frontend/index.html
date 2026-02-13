@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AnimeRepo v4 - 40K+ anime database. Lightweight data view, download compressed data, open full page.">
+  <title>AnimeRepo v4 - Anime Database</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/src/css/index.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="logo"><i class="fas fa-film"></i> AnimeRepo</div>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#browse">Browse</a></li>
+        <li><a href="https://github.com/mTulsiram/AnimeRepo" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank" rel="noopener">Support</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1>AnimeRepo v4</h1>
+      <p class="hero-subtitle">Discover 40K+ anime. View data in a popup, download compressed export, or open full page.</p>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-number" id="statCount">—</div><div class="stat-label">Anime Titles</div></div>
+        <div class="stat"><div class="stat-number">7+</div><div class="stat-label">Data Sources</div></div>
+        <div class="stat"><div class="stat-number">100%</div><div class="stat-label">Free & Open</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container" id="browse">
+    <div class="filters-section">
+      <div class="filters-title"><i class="fas fa-filter"></i> Filters</div>
+      <div class="search-container">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search anime..." autocomplete="off">
+        <button type="button" class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Search</button>
+      </div>
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label class="filter-label">Language</label>
+          <select class="filter-select" id="languageFilter">
+            <option value="">All</option>
+            <option value="English">English Dubbed</option>
+            <option value="Hindi">Hindi Dubbed</option>
+            <option value="Subtitled">Subtitled</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Type</label>
+          <select class="filter-select" id="typeFilter">
+            <option value="">All</option>
+            <option value="TV">TV</option>
+            <option value="MOVIE">Movie</option>
+            <option value="OVA">OVA</option>
+            <option value="SPECIAL">Special</option>
+            <option value="ONA">ONA</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Genre</label>
+          <select class="filter-select" id="genreFilter">
+            <option value="">All</option>
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Drama">Drama</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Horror">Horror</option>
+            <option value="Romance">Romance</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Thriller">Thriller</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Year</label>
+          <select class="filter-select" id="yearFilter">
+            <option value="">All</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+            <option value="2010">2010s</option>
+            <option value="2000">2000s</option>
+            <option value="1990">1990s</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Status</label>
+          <select class="filter-select" id="statusFilter">
+            <option value="">All</option>
+            <option value="FINISHED">Finished</option>
+            <option value="AIRING">Airing</option>
+            <option value="NOT_YET_AIRED">Not Yet Aired</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button type="button" class="search-btn btn-danger" id="clearFilters"><i class="fas fa-times"></i> Clear</button>
+      </div>
+    </div>
+
+    <div class="results-header">
+      <span class="results-count">Showing <strong id="resultCount">0</strong> anime</span>
+      <div class="view-options">
+        <button type="button" class="view-btn active" id="gridView"><i class="fas fa-th"></i> Grid</button>
+        <button type="button" class="view-btn" id="listView"><i class="fas fa-list"></i> List</button>
+      </div>
+    </div>
+
+    <div class="anime-grid" id="animeGrid" role="list"></div>
+    <div class="loading" id="loading" aria-live="polite">Loading…</div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <i class="fas fa-search"></i>
+      <h3>No anime found</h3>
+      <p>Try different filters or search.</p>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>AnimeRepo</h3>
+        <p>Free anime database. Data in a popup, download as compressed file, or open full page.</p>
+        <a href="https://github.com/mTulsiram/AnimeRepo" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+      </div>
+      <div class="footer-section">
+        <h3>Links</h3>
+        <ul>
+          <li><a href="#browse">Browse</a></li>
+          <li><a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank" rel="noopener">Report Bug</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 AnimeRepo</div>
+  </footer>
+
+  <div id="modal-root"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

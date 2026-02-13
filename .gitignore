@@ -16,3 +16,8 @@ _site/
 # counterproductive to check this file into the repository.
 # Details at https://github.com/github/pages-gem/issues/768
 Gemfile.lock
+
+# Frontend (Vite / Bun)
+frontend/node_modules/
+frontend/dist/
+frontend/bun.lockb

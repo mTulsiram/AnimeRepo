@@ -1,0 +1,21 @@
+{
+  "name": "animerepo-frontend",
+  "version": "4.0.0",
+  "description": "AnimeRepo SPA - Vite build, code splitting, compressed data export",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "copy-dist": "node scripts/copy-dist.js",
+    "copy-dist:bun": "bun scripts/copy-dist.js",
+    "deploy": "vite build && node scripts/copy-dist.js",
+    "deploy:bun": "vite build && bun scripts/copy-dist.js"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  },
+  "dependencies": {
+    "pako": "^2.1.0"
+  }
+}
