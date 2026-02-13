@@ -1,6 +1,13 @@
 # AnimeRepo v4 Release Notes
 
-## v4.0.2 (latest)
+## v4.0.3 (latest)
+
+- **Anime pages** – Regenerated 40k+ pages with `generate_anime_pages.py` (minimal format, anime-offline-database + language dubs).
+- **Generator** – Uses minified JSON by default; `--json`, `--jsonl`, `--limit`, `--chunk-size`; filename sanitization for Windows; no v3 branding.
+- **Docs** – `GENERATE-ANIME-PAGES.md` with test run and full regeneration instructions.
+- **Language dubs** – Updated `language_dubs.json` (872 English, 49 Hindi); `scripts/parse-dubs-list.js` for parsing dub lists.
+
+## v4.0.2
 
 - **Root index** – Replaced v3 page with new SPA; header shows "AnimeRepo" (no v3). Mobile hamburger menu.
 - **Filters** – Year: 1990/2000/2010 = decades, 2020–2024 = single year. Genre/type/status case-insensitive; genre options include Slice of Life, Sports, Mystery.
@@ -44,6 +51,8 @@ From repo root (PowerShell):
 This makes up to 3 commits (frontend, built assets, remaining) and pushes once.
 
 ## Create GitHub release
+
+**v4.0.3:** Run `.\release-v4.0.3.ps1` (or use GitHub UI with tag `v4.0.3`).
 
 **v4.0.1:** Run `.\release-v4.0.1.ps1` (or use GitHub UI with tag `v4.0.1`).
 
