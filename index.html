@@ -1,1074 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AnimeRepo v3.0 - 40,510+ anime database with advanced filters, search, and streaming links">
-    <title>AnimeRepo v3.0 - 40K+ Anime Database</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --tertiary: #f093fb;
-            --success: #11998e;
-            --danger: #ff6b6b;
-            --warning: #ffa502;
-            --light: #f8f9fa;
-            --dark: #1a1a2e;
-            --text: #333;
-            --border: #e0e0e0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0f0f23;
-            color: var(--text);
-            line-height: 1.6;
-        }
-
-        /* Navbar */
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            padding: 15px 20px;
-        }
-
-        .navbar-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 46px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .hero-subtitle {
-            font-size: 18px;
-            opacity: 0.95;
-            margin-bottom: 30px;
-        }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .stat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: bold;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        /* Filters */
-        .filters-section {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-
-        .filters-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .search-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .search-btn {
-            padding: 12px 25px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .search-btn:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .filter-label {
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            color: var(--primary);
-        }
-
-        .filter-select, .filter-input {
-            padding: 10px 12px;
-            border: 2px solid var(--border);
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.3s;
-            background: white;
-        }
-
-        .filter-select:focus, .filter-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .filter-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: #f0f0ff;
-            color: var(--primary);
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .chip:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .chip.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Results Header */
-        .results-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 25px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .results-count {
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .view-options {
-            display: flex;
-            gap: 10px;
-        }
-
-        .view-btn {
-            padding: 8px 12px;
-            border: 2px solid var(--border);
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 12px;
-        }
-
-        .view-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Anime Grid */
-        .anime-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .anime-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .anime-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .anime-poster {
-            width: 100%;
-            height: 250px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .anime-poster img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .anime-poster .poster-fallback {
-            display: none;
-            position: absolute;
-            inset: 0;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .anime-info {
-            padding: 15px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .anime-title {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text);
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .anime-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .anime-rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--warning);
-            font-weight: 600;
-            margin-top: auto;
-        }
-
-        .anime-card-link {
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
-
-        .page-btn {
-            padding: 10px 14px;
-            border: 2px solid var(--border);
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .page-btn:hover, .page-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--dark);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-            margin-top: 60px;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            text-align: left;
-            margin-bottom: 30px;
-        }
-
-        .footer-section h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-            font-size: 16px;
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 8px;
-        }
-
-        .footer-section a {
-            color: #ccc;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-section a:hover {
-            color: var(--primary);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
-            text-align: center;
-            color: #aaa;
-        }
-
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--primary);
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 12px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: var(--border);
-        }
-
-        /* List view */
-        .anime-grid.list-view {
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .anime-grid.list-view .anime-card-link {
-            flex-direction: row;
-        }
-
-        .anime-grid.list-view .anime-card {
-            flex-direction: row;
-            max-height: 100px;
-        }
-
-        .anime-grid.list-view .anime-poster {
-            width: 70px;
-            min-width: 70px;
-            height: 100px;
-            flex-shrink: 0;
-        }
-
-        .anime-grid.list-view .anime-info {
-            flex-direction: row;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .anime-grid.list-view .anime-title {
-            -webkit-line-clamp: 1;
-            width: 100%;
-        }
-
-        .anime-grid.list-view .anime-meta,
-        .anime-grid.list-view .anime-rating {
-            margin-top: 0;
-        }
-
-        /* Touch-friendly and prevent iOS zoom */
-        .search-input, .filter-select, .filter-input {
-            font-size: 16px;
-            min-height: 44px;
-        }
-
-        .search-btn, .page-btn, .view-btn {
-            min-height: 44px;
-            min-width: 44px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero {
-                padding: 40px 16px;
-            }
-
-            .hero h1 {
-                font-size: 28px;
-            }
-
-            .hero-subtitle {
-                font-size: 14px;
-            }
-
-            .hero-stats {
-                gap: 16px;
-            }
-
-            .stat-number {
-                font-size: 22px;
-            }
-
-            .container {
-                padding: 20px 16px;
-            }
-
-            .filters-section {
-                padding: 20px 16px;
-            }
-
-            .filter-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .search-container {
-                flex-direction: column;
-            }
-
-            .results-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-
-            .anime-grid {
-                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-                gap: 14px;
-            }
-
-            .anime-poster {
-                height: 190px;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .navbar-content {
-                justify-content: flex-start;
-            }
-
-            .navbar {
-                padding: 12px 16px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 24px;
-            }
-
-            .anime-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-
-            .anime-poster {
-                height: 160px;
-            }
-        }
-
-        /* Safe area for notched devices */
-        .navbar, .hero, .container, .footer {
-            padding-left: max(env(safe-area-inset-left), 20px);
-            padding-right: max(env(safe-area-inset-right), 20px);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="AnimeRepo - Free 40K+ anime database. Browse, filter, view details, and find where to watch. No backend, runs on GitHub Pages.">
+  <title>AnimeRepo - Anime Database</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/index-DIGnYX85.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-content">
-            <div class="logo">
-                <i class="fas fa-film"></i>
-                AnimeRepo
-            </div>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#browse">Browse</a></li>
-                <li><a href="https://github.com/mTulsiram/AnimeRepo" target="_blank">GitHub</a></li>
-                <li><a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank">Support</a></li>
-            </ul>
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="logo"><i class="fas fa-film"></i> AnimeRepo</div>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#browse">Browse</a></li>
+        <li><a href="https://github.com/mTulsiram/AnimeRepo" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank" rel="noopener">Support</a></li>
+      </ul>
+      <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    </div>
+  </nav>
+
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1>AnimeRepo</h1>
+      <p class="hero-subtitle">Browse 40,000+ anime. Filter by language, genre, and year. Click any title for details and links to watch on legal streaming services.</p>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-number" id="statCount">—</div><div class="stat-label">Anime Titles</div></div>
+        <div class="stat"><div class="stat-number">7+</div><div class="stat-label">Data Sources</div></div>
+        <div class="stat"><div class="stat-number">100%</div><div class="stat-label">Free & Open</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container" id="browse">
+    <div class="filters-section">
+      <div class="filters-title"><i class="fas fa-filter"></i> Search & filters</div>
+      <div class="search-container">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by title (e.g. Death Note, Naruto)…" autocomplete="off">
+        <button type="button" class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Search</button>
+      </div>
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label class="filter-label" for="languageFilter">Language</label>
+          <select class="filter-select" id="languageFilter" aria-label="Filter by language">
+            <option value="">All</option>
+            <option value="English">English Dubbed</option>
+            <option value="Hindi">Hindi Dubbed</option>
+            <option value="Subtitled">Subtitled</option>
+          </select>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1>🎬 AnimeRepo v3.0</h1>
-            <p class="hero-subtitle">Discover 40,510+ Anime Titles with Advanced Search & Filters</p>
-            <div class="hero-stats">
-                <div class="stat">
-                    <div class="stat-number">40,510+</div>
-                    <div class="stat-label">Anime Titles</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">7+</div>
-                    <div class="stat-label">Data Sources</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">100%</div>
-                    <div class="stat-label">Free & Open</div>
-                </div>
-            </div>
+        <div class="filter-group">
+          <label class="filter-label" for="typeFilter">Type</label>
+          <select class="filter-select" id="typeFilter" aria-label="Filter by type">
+            <option value="">All</option>
+            <option value="TV">TV</option>
+            <option value="MOVIE">Movie</option>
+            <option value="OVA">OVA</option>
+            <option value="SPECIAL">Special</option>
+            <option value="ONA">ONA</option>
+          </select>
         </div>
-    </section>
-
-    <!-- Main Container -->
-    <div class="container" id="browse">
-        <!-- Filters -->
-        <div class="filters-section">
-            <div class="filters-title">
-                <i class="fas fa-filter"></i>
-                Advanced Filters
-            </div>
-
-            <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search anime by name (Death Note, Naruto, etc.)">
-                <button class="search-btn" onclick="performSearch()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-            </div>
-
-            <div class="filter-grid">
-                <div class="filter-group">
-                    <label class="filter-label">Language</label>
-                    <select class="filter-select" id="languageFilter" onchange="applyFilters()">
-                        <option value="">All Languages</option>
-                        <option value="English">English Dubbed</option>
-                        <option value="Hindi">Hindi Dubbed</option>
-                        <option value="Subtitled">Subtitled</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">Type</label>
-                    <select class="filter-select" id="typeFilter" onchange="applyFilters()">
-                        <option value="">All Types</option>
-                        <option value="TV">TV Series</option>
-                        <option value="MOVIE">Movie</option>
-                        <option value="OVA">OVA</option>
-                        <option value="SPECIAL">Special</option>
-                        <option value="ONA">ONA</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">Genre</label>
-                    <select class="filter-select" id="genreFilter" onchange="applyFilters()">
-                        <option value="">All Genres</option>
-                        <option value="Action">Action</option>
-                        <option value="Adventure">Adventure</option>
-                        <option value="Comedy">Comedy</option>
-                        <option value="Drama">Drama</option>
-                        <option value="Fantasy">Fantasy</option>
-                        <option value="Horror">Horror</option>
-                        <option value="Romance">Romance</option>
-                        <option value="Sci-Fi">Sci-Fi</option>
-                        <option value="Thriller">Thriller</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">Year</label>
-                    <select class="filter-select" id="yearFilter" onchange="applyFilters()">
-                        <option value="">All Years</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                        <option value="2020">2020</option>
-                        <option value="2010">2010s</option>
-                        <option value="2000">2000s</option>
-                        <option value="1990">1990s</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">Status</label>
-                    <select class="filter-select" id="statusFilter" onchange="applyFilters()">
-                        <option value="">All Status</option>
-                        <option value="FINISHED">Finished</option>
-                        <option value="AIRING">Currently Airing</option>
-                        <option value="NOT_YET_AIRED">Not Yet Aired</option>
-                    </select>
-                </div>
-            </div>
-
-            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="search-btn" onclick="clearFilters()" style="background: var(--danger);">
-                    <i class="fas fa-times"></i> Clear Filters
-                </button>
-                <button class="search-btn" onclick="resetSearch()" style="background: var(--success);">
-                    <i class="fas fa-sync"></i> Reset
-                </button>
-            </div>
+        <div class="filter-group">
+          <label class="filter-label" for="genreFilter">Genre</label>
+          <select class="filter-select" id="genreFilter" aria-label="Filter by genre">
+            <option value="">All</option>
+            <option value="action">Action</option>
+            <option value="adventure">Adventure</option>
+            <option value="comedy">Comedy</option>
+            <option value="drama">Drama</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="horror">Horror</option>
+            <option value="romance">Romance</option>
+            <option value="sci-fi">Sci-Fi</option>
+            <option value="thriller">Thriller</option>
+            <option value="slice of life">Slice of Life</option>
+            <option value="sports">Sports</option>
+            <option value="mystery">Mystery</option>
+          </select>
         </div>
-
-        <!-- Results Header -->
-        <div class="results-header">
-            <span class="results-count">Showing <strong id="resultCount">0</strong> anime</span>
-            <div class="view-options">
-                <button class="view-btn active" id="gridView" onclick="changeView('grid')">
-                    <i class="fas fa-th"></i> Grid
-                </button>
-                <button class="view-btn" id="listView" onclick="changeView('list')">
-                    <i class="fas fa-list"></i> List
-                </button>
-            </div>
+        <div class="filter-group">
+          <label class="filter-label" for="yearFilter">Year</label>
+          <select class="filter-select" id="yearFilter" aria-label="Filter by year">
+            <option value="">All</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+            <option value="2010">2010s</option>
+            <option value="2000">2000s</option>
+            <option value="1990">1990s</option>
+          </select>
         </div>
-
-        <!-- Anime Grid -->
-        <div class="anime-grid" id="animeGrid" role="list"></div>
-
-        <!-- Loading -->
-        <div class="loading" id="loading" style="display: none;">
-            <div class="loading-spinner"></div>
-            <p>Loading anime...</p>
+        <div class="filter-group">
+          <label class="filter-label" for="statusFilter">Status</label>
+          <select class="filter-select" id="statusFilter" aria-label="Filter by status">
+            <option value="">All</option>
+            <option value="FINISHED">Finished</option>
+            <option value="AIRING">Airing</option>
+            <option value="NOT_YET_AIRED">Not Yet Aired</option>
+          </select>
         </div>
-
-        <!-- Empty State -->
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="fas fa-search"></i>
-            <h3>No anime found</h3>
-            <p>Try adjusting your filters or search terms</p>
-        </div>
-
-        <!-- Pagination -->
-        <div class="pagination" id="pagination"></div>
+      </div>
+      <div class="filter-actions">
+        <button type="button" class="search-btn btn-danger" id="clearFilters"><i class="fas fa-times"></i> Clear</button>
+      </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>About AnimeRepo</h3>
-                <p style="margin-bottom: 15px;">AnimeRepo is a free, open-source anime database with 40,510+ titles and advanced search capabilities.</p>
-                <a href="https://github.com/mTulsiram/AnimeRepo" target="_blank" style="color: var(--primary); font-weight: 600;">
-                    <i class="fab fa-github"></i> View on GitHub
-                </a>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="#browse">Browse Anime</a></li>
-                    <li><a href="https://github.com/mTulsiram/AnimeRepo/issues">Report Bug</a></li>
-                    <li><a href="https://github.com/mTulsiram/AnimeRepo/discussions">Get Help</a></li>
-                    <li><a href="https://github.com/mTulsiram/AnimeRepo/blob/main/LICENSE">License</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Data Sources</h3>
-                <ul>
-                    <li><a href="https://myanimelist.net">MyAnimeList</a></li>
-                    <li><a href="https://anilist.co">AniList</a></li>
-                    <li><a href="https://anidb.net">AniDB</a></li>
-                    <li><a href="https://kitsu.app">Kitsu</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 AnimeRepo. All rights reserved. | <a href="https://github.com/mTulsiram/AnimeRepo/blob/main/LICENSE" target="_blank">MIT License</a></p>
-        </div>
-    </footer>
+    <div class="results-header">
+      <span class="results-count">Showing <strong id="resultCount">0</strong> anime</span>
+      <div class="view-options">
+        <button type="button" class="view-btn active" id="gridView" aria-pressed="true"><i class="fas fa-th"></i> Grid</button>
+        <button type="button" class="view-btn" id="listView" aria-pressed="false"><i class="fas fa-list"></i> List</button>
+      </div>
+    </div>
 
-    <script>
-        let allAnime = [];
-        let filteredAnime = [];
-        let currentPage = 1;
-        const itemsPerPage = 24;
+    <div class="anime-grid" id="animeGrid" role="list"></div>
+    <div class="loading" id="loading" aria-live="polite">Loading…</div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <i class="fas fa-search"></i>
+      <h3>No anime found</h3>
+      <p>Try different filters or search.</p>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
 
-        // Match Python generate_anime_pages.py safe filename logic so links point to actual files
-        function titleToFilename(title) {
-            if (!title || typeof title !== 'string') return 'Unknown.html';
-            let s = title
-                .replace(/\//g, '_').replace(/\\/g, '_')
-                .replace(/\?/g, '').replace(/\*/g, '').replace(/:/g, '_')
-                .replace(/</g, '').replace(/>/g, '').replace(/\|/g, '_')
-                .replace(/["\u201C\u201D\u201F]/g, '').replace(/['\u2018\u2019\u201A\u2032]/g, '')
-                .replace(/`/g, '').replace(/\u00B4/g, '')
-                .trim();
-            s = s.slice(0, 200);
-            return s ? s + '.html' : 'Unknown.html';
-        }
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>AnimeRepo</h3>
+        <p>Free, open-source anime database. No video hosting—we link to MyAnimeList, AniList, and legal streaming search (Crunchyroll, JustWatch).</p>
+        <a href="https://github.com/mTulsiram/AnimeRepo" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+      </div>
+      <div class="footer-section">
+        <h3>Links</h3>
+        <ul>
+          <li><a href="#browse">Browse</a></li>
+          <li><a href="https://github.com/mTulsiram/AnimeRepo/issues" target="_blank" rel="noopener">Report bug</a></li>
+          <li><a href="https://github.com/mTulsiram/AnimeRepo/blob/main/README.md" target="_blank" rel="noopener">README</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Data &amp; watch</h3>
+        <ul>
+          <li><a href="https://github.com/manami-project/anime-offline-database" target="_blank" rel="noopener">anime-offline-database</a></li>
+          <li><a href="https://www.crunchyroll.com" target="_blank" rel="noopener">Crunchyroll</a></li>
+          <li><a href="https://www.justwatch.com" target="_blank" rel="noopener">JustWatch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 AnimeRepo · Metadata only; watch via linked legal services.</div>
+  </footer>
 
-        function getAnimePageUrl(title) {
-            return 'anime/' + encodeURIComponent(titleToFilename(title));
-        }
+  <div id="modal-root"></div>
 
-        let languageDubs = { english_dubbed: [], hindi_dubbed: [] };
-
-        // Load anime data from JSON and language dubs for filter
-        async function loadAnimeData() {
-            try {
-                document.getElementById('loading').style.display = 'block';
-                const [dataRes, langRes] = await Promise.all([
-                    fetch('anime-offline-database-minified.json'),
-                    fetch('language_dubs.json').catch(() => null)
-                ]);
-                const data = await dataRes.json();
-                allAnime = Array.isArray(data) ? data : (data.data || data.anime || []);
-                if (langRes && langRes.ok) {
-                    languageDubs = await langRes.json();
-                }
-                filteredAnime = allAnime;
-                displayAnime();
-                document.getElementById('loading').style.display = 'none';
-            } catch (error) {
-                console.error('Error loading anime data:', error);
-                document.getElementById('loading').innerHTML = '<p style="color: red;">Error loading data. Please refresh the page.</p>';
-            }
-        }
-
-        function displayAnime() {
-            const grid = document.getElementById('animeGrid');
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageAnime = filteredAnime.slice(start, end);
-
-            if (pageAnime.length === 0) {
-                grid.innerHTML = '';
-                document.getElementById('emptyState').style.display = 'block';
-                document.getElementById('resultCount').textContent = '0';
-                document.getElementById('pagination').innerHTML = '';
-                return;
-            }
-
-            document.getElementById('emptyState').style.display = 'none';
-            grid.innerHTML = pageAnime.map(anime => `
-                <a href="${getAnimePageUrl(anime.title)}" class="anime-card-link">
-                    <div class="anime-card">
-                        <div class="anime-poster">
-                            ${anime.picture ? `<img src="${escapeHtml(anime.picture)}" alt="" loading="lazy" onerror="this.style.display=\'none\';var n=this.nextElementSibling;if(n)n.style.display=\'flex\';"><i class="fas fa-film poster-fallback" aria-hidden="true"></i>` : '<i class="fas fa-film" aria-hidden="true"></i>'}
-                        </div>
-                        <div class="anime-info">
-                            <div class="anime-title">${escapeHtml(anime.title)}</div>
-                            <div class="anime-meta">
-                                <span>${anime.type || 'Unknown'}</span>
-                                <span>${anime.episodes || '?'} eps</span>
-                            </div>
-                            <div class="anime-rating">
-                                <i class="fas fa-star"></i>
-                                ${anime.score?.arithmeticMean ? anime.score.arithmeticMean.toFixed(1) : 'N/A'}
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            `).join('');
-
-            document.getElementById('resultCount').textContent = filteredAnime.length;
-            generatePagination();
-        }
-
-        function generatePagination() {
-            const totalPages = Math.ceil(filteredAnime.length / itemsPerPage);
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
-
-            if (totalPages <= 1) return;
-
-            for (let i = 1; i <= Math.min(totalPages, 10); i++) {
-                const btn = document.createElement('button');
-                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                btn.textContent = i;
-                btn.onclick = () => {
-                    currentPage = i;
-                    displayAnime();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                };
-                pagination.appendChild(btn);
-            }
-
-            if (totalPages > 10) {
-                const btn = document.createElement('button');
-                btn.className = 'page-btn';
-                btn.textContent = '...';
-                btn.disabled = true;
-                pagination.appendChild(btn);
-            }
-        }
-
-        function getAnimeLanguages(title) {
-            const t = (title || '').trim();
-            const eng = (languageDubs.english_dubbed || []).indexOf(t) >= 0;
-            const hin = (languageDubs.hindi_dubbed || []).indexOf(t) >= 0;
-            if (eng && hin) return ['English Dubbed', 'Hindi Dubbed'];
-            if (eng) return ['English Dubbed'];
-            if (hin) return ['Hindi Dubbed'];
-            return ['Subtitled'];
-        }
-
-        function applyFilters() {
-            currentPage = 1;
-            const type = document.getElementById('typeFilter').value;
-            const genre = document.getElementById('genreFilter').value;
-            const yearVal = document.getElementById('yearFilter').value;
-            const status = document.getElementById('statusFilter').value;
-            const language = document.getElementById('languageFilter').value;
-
-            filteredAnime = allAnime.filter(anime => {
-                if (type && anime.type !== type) return false;
-                const tags = anime.tags || [];
-                const genreMatch = !genre || tags.some(t => String(t).toLowerCase().includes(genre.toLowerCase()));
-                if (!genreMatch) return false;
-                if (yearVal) {
-                    const y = anime.animeSeason && (anime.animeSeason.year != null) ? Number(anime.animeSeason.year) : 0;
-                    if (yearVal.length === 4) {
-                        const decade = parseInt(yearVal, 10);
-                        if (decade >= 1990 && decade < 2010) {
-                            if (y < decade || y >= decade + 10) return false;
-                        } else if (decade >= 2010 && decade < 2030) {
-                            if (y < decade || y >= decade + 10) return false;
-                        } else if (y != decade) return false;
-                    } else if (y != yearVal) return false;
-                }
-                if (status && anime.status !== status) return false;
-                const langs = getAnimeLanguages(anime.title);
-                if (language === 'English' && !langs.some(l => l.toLowerCase().includes('english'))) return false;
-                if (language === 'Hindi' && !langs.some(l => l.toLowerCase().includes('hindi'))) return false;
-                if (language === 'Subtitled' && !langs.some(l => l.toLowerCase().includes('subtitled'))) return false;
-                return true;
-            });
-
-            displayAnime();
-        }
-
-        function performSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            currentPage = 1;
-
-            filteredAnime = allAnime.filter(anime =>
-                anime.title.toLowerCase().includes(query) ||
-                anime.synonyms?.some(s => s.toLowerCase().includes(query))
-            );
-
-            displayAnime();
-        }
-
-        function clearFilters() {
-            document.getElementById('typeFilter').value = '';
-            document.getElementById('genreFilter').value = '';
-            document.getElementById('yearFilter').value = '';
-            document.getElementById('statusFilter').value = '';
-            document.getElementById('languageFilter').value = '';
-            document.getElementById('searchInput').value = '';
-            filteredAnime = allAnime;
-            currentPage = 1;
-            displayAnime();
-        }
-
-        function resetSearch() {
-            document.getElementById('searchInput').value = '';
-            clearFilters();
-        }
-
-        function changeView(view) {
-            document.getElementById('gridView').classList.toggle('active', view === 'grid');
-            document.getElementById('listView').classList.toggle('active', view === 'list');
-            const grid = document.getElementById('animeGrid');
-            if (view === 'list') grid.classList.add('list-view');
-            else grid.classList.remove('list-view');
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Load data on page load
-        window.addEventListener('load', loadAnimeData);
-
-        // Search on Enter key
-        document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') performSearch();
-                });
-            }
+  <script>
+    (function() {
+      var t = document.getElementById('navToggle');
+      var n = document.getElementById('navLinks');
+      if (t && n) {
+        t.addEventListener('click', function() {
+          n.classList.toggle('open');
+          t.setAttribute('aria-expanded', n.classList.contains('open'));
+          var i = t.querySelector('i');
+          if (i) { i.className = n.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars'; }
         });
-    </script>
+        n.querySelectorAll('a').forEach(function(a) {
+          a.addEventListener('click', function() {
+            n.classList.remove('open');
+            t.setAttribute('aria-expanded', 'false');
+            var i = t.querySelector('i');
+            if (i) i.className = 'fas fa-bars';
+          });
+        });
+      }
+    })();
+  </script>
+  <script type="module" src="assets/index-iBzafveg.js"></script>
 </body>
 </html>

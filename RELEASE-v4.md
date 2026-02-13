@@ -1,6 +1,12 @@
 # AnimeRepo v4 Release Notes
 
-## v4.0.1 (latest)
+## v4.0.2 (latest)
+
+- **Root index** – Replaced v3 page with new SPA; header shows "AnimeRepo" (no v3). Mobile hamburger menu.
+- **Filters** – Year: 1990/2000/2010 = decades, 2020–2024 = single year. Genre/type/status case-insensitive; genre options include Slice of Life, Sports, Mystery.
+- **Mobile** – Hamburger nav, touch-friendly targets, safe-area padding, responsive filter grid.
+
+## v4.0.1
 
 - **UI polish** – DM Sans font, updated indigo/violet palette, improved hero subtitle and footer.
 - **Cards** – 12px radius, hover shadow, clearer “Where to watch” messaging.

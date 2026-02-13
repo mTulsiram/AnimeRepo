@@ -1,11 +1,13 @@
 # ============================================
 # AnimeRepo v4.0.1 - Create GitHub Release
-# Run after pushing. Uses gh CLI if installed.
+# Run after pushing. Requires: gh auth login (once).
 # ============================================
 
 $ErrorActionPreference = "Stop"
 $repoRoot = "c:\Users\tulsiram_methre\OneDrive - S&P Global\Documents\Projects\AnimeRepo"
 Set-Location -LiteralPath $repoRoot
+$ghExe = "C:\Program Files\GitHub CLI\gh.exe"
+if (-not (Test-Path $ghExe)) { $ghExe = "gh" }
 
 $tag = "v4.0.1"
 $title = "v4.0.1 - UI polish, README, Where to watch, footer"
@@ -38,19 +40,16 @@ Write-Host "  Create GitHub Release: $tag" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-$gh = Get-Command gh -ErrorAction SilentlyContinue
-if ($gh) {
-    Write-Host "Using GitHub CLI (gh) to create release..." -ForegroundColor Green
-    $bodyFile = Join-Path $env:TEMP "animerepo-release-body.md"
-    $body | Set-Content -Path $bodyFile -Encoding UTF8
-    gh release create $tag --title $title --notes-file $bodyFile
-    Remove-Item $bodyFile -ErrorAction SilentlyContinue
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "Release created: https://github.com/mTulsiram/AnimeRepo/releases/tag/$tag" -ForegroundColor Green
-        exit 0
-    }
-    Write-Host "gh release create failed. Use manual steps below." -ForegroundColor Yellow
+Write-Host "Using GitHub CLI to create release..." -ForegroundColor Green
+$bodyFile = Join-Path $env:TEMP "animerepo-release-body.md"
+$body | Set-Content -Path $bodyFile -Encoding UTF8
+& $ghExe release create $tag --title $title --notes-file $bodyFile
+Remove-Item $bodyFile -ErrorAction SilentlyContinue
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Release created: https://github.com/mTulsiram/AnimeRepo/releases/tag/$tag" -ForegroundColor Green
+    exit 0
 }
+Write-Host "gh release create failed. If you see 'please run: gh auth login', run that first, then run this script again." -ForegroundColor Yellow
 
 Write-Host "GitHub CLI (gh) not found or failed. Creating tag locally." -ForegroundColor Yellow
 $tagExists = git tag -l $tag

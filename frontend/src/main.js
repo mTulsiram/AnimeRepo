@@ -133,8 +133,22 @@ function bindUi() {
   const gridView = $('gridView');
   const listView = $('listView');
   const animeGrid = $('animeGrid');
-  if (gridView) gridView.addEventListener('click', () => { gridView.classList.add('active'); listView?.classList.remove('active'); animeGrid?.classList.remove('list-view'); });
-  if (listView) listView.addEventListener('click', () => { listView.classList.add('active'); gridView?.classList.remove('active'); animeGrid?.classList.add('list-view'); });
+  if (gridView) gridView.addEventListener('click', () => { gridView.classList.add('active'); listView?.classList.remove('active'); animeGrid?.classList.remove('list-view'); gridView?.setAttribute('aria-pressed', 'true'); listView?.setAttribute('aria-pressed', 'false'); });
+  if (listView) listView.addEventListener('click', () => { listView.classList.add('active'); gridView?.classList.remove('active'); animeGrid?.classList.add('list-view'); listView?.setAttribute('aria-pressed', 'true'); gridView?.setAttribute('aria-pressed', 'false'); });
+
+  const navToggle = $('navToggle');
+  const navLinks = $('navLinks');
+  if (navToggle && navLinks) {
+    navToggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', open);
+      navToggle.querySelector('i')?.classList.toggle('fa-bars', !open);
+      navToggle.querySelector('i')?.classList.toggle('fa-times', open);
+    });
+    navLinks.querySelectorAll('a').forEach((a) => {
+      a.addEventListener('click', () => { navLinks.classList.remove('open'); navToggle?.setAttribute('aria-expanded', 'false'); navToggle?.querySelector('i')?.classList.toggle('fa-bars', true); navToggle?.querySelector('i')?.classList.toggle('fa-times', false); });
+    });
+  }
 }
 
 async function init() {
