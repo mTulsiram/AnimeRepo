@@ -41,7 +41,7 @@ class AnimePageGenerator:
     def load_anime_data(self, jsonl_file):
         """Load anime data from JSONL file (one JSON object per line)"""
         try:
-            print(f"📥 Loading {jsonl_file}...")
+            print(f"Loading {jsonl_file}...")
             anime_list = []
             with open(jsonl_file, 'r', encoding='utf-8') as f:
                 # Skip metadata line
@@ -55,10 +55,25 @@ class AnimePageGenerator:
                     except json.JSONDecodeError:
                         continue
             
-            print(f"✅ Loaded {len(anime_list)} anime")
+            print(f"Loaded {len(anime_list)} anime")
             return anime_list
         except Exception as e:
-            print(f"❌ Error loading {jsonl_file}: {e}")
+            print(f"Error loading {jsonl_file}: {e}")
+            return []
+
+    def load_anime_data_minified(self, json_path):
+        """Load anime data from anime-offline-database-minified.json (single JSON with 'data' array)"""
+        try:
+            print(f"Loading {json_path}...")
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            anime_list = data.get('data') if isinstance(data, dict) else (data if isinstance(data, list) else [])
+            if not isinstance(anime_list, list):
+                anime_list = []
+            print(f"Loaded {len(anime_list)} anime")
+            return anime_list
+        except Exception as e:
+            print(f"Error loading {json_path}: {e}")
             return []
     
     def generate_anime_page_minimal(self, anime):
@@ -70,8 +85,10 @@ class AnimePageGenerator:
             safe_title = safe_title.replace('<', '').replace('>', '').replace('|', '_')
             for q in '"\'"\u201c\u201d\u201f\u2018\u2019\u201a`\u00b4':
                 safe_title = safe_title.replace(q, '')
-            safe_title = safe_title.strip()[:200]
-            safe_filename = safe_title + '.html' if safe_title else 'Unknown.html'
+            safe_title = safe_title.strip()[:180]
+            while safe_title and safe_title[-1] in '. ':
+                safe_title = safe_title[:-1]
+            safe_filename = (safe_title or 'Unknown') + '.html'
             file_path = self.output_dir / safe_filename
 
             duration = anime.get('duration', {})
@@ -110,7 +127,7 @@ class AnimePageGenerator:
             return True
         except Exception as e:
             self.failed_pages += 1
-            print(f"❌ Minimal page failed for {anime.get('title', 'Unknown')}: {e}")
+            print(f"Minimal page failed for {anime.get('title', 'Unknown')}: {e}")
             return False
 
     def generate_anime_page(self, anime):
@@ -167,8 +184,8 @@ class AnimePageGenerator:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{self.escape_html(title)} - AnimeRepo v3.0</title>
-    <meta name="description" content="Stream {self.escape_html(title)} online. Get watching links, ratings, reviews and more on AnimeRepo.">
+    <title>{self.escape_html(title)} - AnimeRepo</title>
+    <meta name="description" content="{self.escape_html(title)}: details, score, where to watch. AnimeRepo links to MAL, AniList, Crunchyroll and more.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {{
@@ -693,7 +710,7 @@ class AnimePageGenerator:
             
         except Exception as e:
             self.failed_pages += 1
-            print(f"❌ Error generating page for {anime.get('title', 'Unknown')}: {e}")
+            print(f"Error generating page for {anime.get('title', 'Unknown')}: {e}")
             return False
     
     def is_mostly_english(self, text):
@@ -756,21 +773,25 @@ class AnimePageGenerator:
         else:
             return 'external-link-alt'
     
-    def generate_all(self, json_file, chunk_size=1000):
-        """Generate pages in chunks"""
-        anime_list = self.load_anime_data(json_file)
+    def generate_all(self, json_file=None, anime_list=None, chunk_size=1000, limit=None):
+        """Generate pages in chunks. Pass anime_list (from minified JSON) or json_file (JSONL path)."""
+        if anime_list is None:
+            anime_list = self.load_anime_data(json_file or 'anime-offline-database.jsonl')
+        if limit is not None and limit > 0:
+            anime_list = anime_list[:limit]
+            print(f"Limited to first {len(anime_list)} anime")
         
-        print(f"\n📊 Starting generation of {len(anime_list)} anime pages...")
-        print(f"💾 Output directory: {self.output_dir.absolute()}\n")
+        print(f"\nStarting generation of {len(anime_list)} anime pages...")
+        print(f"Output directory: {self.output_dir.absolute()}\n")
         
         for i, anime in enumerate(anime_list):
             if i % chunk_size == 0 and i > 0:
-                print(f"✅ Generated {i}/{len(anime_list)} pages ({100*i//len(anime_list)}%)")
+                print(f"Generated {i}/{len(anime_list)} pages ({100*i//len(anime_list)}%)")
             
             self.generate_anime_page(anime)
         
         print(f"\n{'='*70}")
-        print(f"✅ Generation complete!")
+        print(f"Generation complete!")
         print(f"   Total generated: {self.generated_pages}")
         print(f"   Failed: {self.failed_pages}")
         print(f"   Location: {self.output_dir.absolute()}")
@@ -780,9 +801,17 @@ class AnimePageGenerator:
 
 if __name__ == '__main__':
     import argparse
-    p = argparse.ArgumentParser(description='Generate anime HTML pages')
+    p = argparse.ArgumentParser(description='Generate anime HTML pages from anime-offline-database')
     p.add_argument('--minimal', action='store_true', help='Minimal HTML + external assets (anime-detail.js/css), no inline styles')
-    p.add_argument('--jsonl', default='anime-offline-database.jsonl', help='JSONL data file')
+    p.add_argument('--json', default='anime-offline-database-minified.json', help='Minified JSON (data array)')
+    p.add_argument('--jsonl', help='JSONL data file (overrides --json if provided)')
+    p.add_argument('--limit', type=int, default=None, help='Limit number of anime to generate (for testing)')
+    p.add_argument('--chunk-size', type=int, default=5000, help='Progress log every N pages')
     args = p.parse_args()
     generator = AnimePageGenerator(minimal=args.minimal)
-    generator.generate_all(args.jsonl, chunk_size=5000)
+    if args.jsonl:
+        generator.generate_all(json_file=args.jsonl, chunk_size=args.chunk_size, limit=args.limit)
+    else:
+        anime_list = generator.load_anime_data_minified(args.json)
+        if anime_list:
+            generator.generate_all(anime_list=anime_list, chunk_size=args.chunk_size, limit=args.limit)
